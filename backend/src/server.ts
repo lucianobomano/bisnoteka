@@ -1,0 +1,402 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import { PrismaClient, Business } from '@prisma/client';
+import { z } from 'zod';
+import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+
+dotenv.config();
+
+const app = express();
+const prisma = new PrismaClient();
+
+const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY || "YOUR_API_KEY" });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "YOUR_API_KEY" });
+
+app.use(helmet());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type']
+}));
+app.use(express.json({ limit: '100mb' }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+const businessPayloadSchema = z.object({
+    name: z.string().min(1).max(100),
+    niche: z.array(z.string()),
+    problem: z.string().max(1000),
+    audience: z.string().max(200),
+    brandVibe: z.array(z.string()),
+    colorPalette: z.array(z.string()),
+    customColors: z.array(z.string()).optional(),
+    visualStyle: z.array(z.string()),
+    logoType: z.array(z.string()),
+    visuals: z.array(z.string()),
+    strategy: z.array(z.string()),
+    aiModel: z.enum(['faundr', 'biz']).default('faundr')
+});
+
+const DOCUMENT_PROMPTS: Record<string, string> = {
+    "Brandbook": "Cria um Brandbook completo, formatado em Markdown, incluindo essência, propósito, missão, visão, valores, posicionamento, proposta de valor, personalidade, proposta única de valor, arquétipos, identidade verbal, tom de voz, narrativa da marca, manifesto, público-alvo, diferenciais competitivos, direcção visual, experiência da marca e aplicações estratégicas.",
+    "Manual de Normas": "Cria um Manual de Normas Gráficas completo, formatado em Markdown, incluindo logotipo, versões, construção, área de protecção, redução mínima, cores, tipografia, iconografia, fotografia, padrões, aplicações correctas, usos incorrectos, grelhas, templates e regras técnicas de aplicação.",
+    "Plano de Negócio": "Cria um Plano de Negócio completo, formatado em Markdown, incluindo sumário executivo, descrição do negócio, análise de mercado, público-alvo, concorrência, proposta de valor, produtos/serviços, modelo operacional, plano comercial, plano de marketing, plano financeiro, riscos, cronograma e próximos passos.",
+    "Modelo de Negócio": "Cria um Modelo de Negócio completo, formatado em Markdown, usando Business Model Canvas, Value Proposition Canvas, fontes de receita, canais, parcerias, actividades-chave, recursos-chave, estrutura de custos, economia unitária, motor de crescimento e vantagem competitiva.",
+    "Apresentação Institucional": "Cria uma Apresentação Institucional completa, formatada em Markdown, incluindo quem somos, história, missão, visão, valores, serviços, metodologia, diferenciais, sectores atendidos, projectos, equipa, clientes, impacto e contactos.",
+    "Pitch Deck": "Cria um Pitch Deck completo, formatado em Markdown, incluindo problema, oportunidade, solução, produto, mercado, modelo de negócio, tracção, estratégia go-to-market, concorrência, vantagem competitiva, equipa, projecções financeiras, pedido e encerramento.",
+    "Portfólio de Projectos": "Cria um Portfólio de Projectos completo, formatado em Markdown, incluindo apresentação, metodologia, categorias de projectos, estudos de caso, desafios, soluções, resultados, imagens sugeridas, métricas, clientes e encerramento comercial.",
+    "Portfólio Comercial": "Cria um Portfólio Comercial completo, formatado em Markdown, incluindo apresentação, diagnóstico do problema do cliente, soluções, serviços, pacotes, entregáveis, prazos, benefícios, processo de trabalho, provas de valor, perguntas frequentes e chamada para acção.",
+    "Plano de Marketing": "Cria um Plano de Marketing completo, formatado em Markdown, incluindo diagnóstico, mercado, público, posicionamento, objectivos SMART, estratégia de conteúdo, canais, funil, campanhas, tráfego pago, métricas, orçamento e cronograma.",
+    "Calendário 30 Dias IG/FB": "Cria um Calendário Editorial de 30 dias para Instagram e Facebook, formatado em Markdown, incluindo objectivo do conteúdo, pilares, temas diários, formatos, ganchos, roteiros, legendas, CTAs, sugestões visuais e métricas.",
+    "Plano de Lançamento": "Cria um Plano de Lançamento completo, formatado em Markdown, incluindo oferta, big idea, público, pré-lançamento, aquecimento, captação, evento de lançamento, sequência de venda, funil, cronograma, copies, scripts e métricas.",
+    "Plano de Escala": "Cria um Plano de Escala completo, formatado em Markdown, incluindo diagnóstico, metas, produto escalável, estrutura comercial, marketing de escala, operação, equipa, tecnologia, finanças, expansão e indicadores.",
+    "Plano 1 Milhão Kz em 3 Meses": "Cria um Plano de Receita para gerar 1.000.000 Kz em 3 meses, formatado em Markdown, incluindo diagnóstico, meta, matemática da receita, oferta principal, oferta de entrada, oferta premium, funil, prospecção, calendário semanal, scripts comerciais, métricas e plano de contingência."
+};
+
+app.post('/api/business/generate', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const parsedPayload = businessPayloadSchema.parse(req.body);
+
+        const requestedDocsPrompts = parsedPayload.strategy.map(docName => {
+            const rule = DOCUMENT_PROMPTS[docName] || `Cria um ${docName} completo e detalhado em Markdown.`;
+            return `- **${docName}**: ${rule}`;
+        }).join('\n');
+
+        const prompt = `Aja como o diretor de estratégia (CSO) e diretor de arte de uma agência de topo mundial.
+A tua missão é construir a documentação estratégica e a identidade da marca para um novo império com base neste briefing:
+
+**DADOS DO NEGÓCIO:**
+Nome: ${parsedPayload.name}
+Nicho: ${parsedPayload.niche.join(', ')}
+Problema Resolvido: ${parsedPayload.problem}
+Público-Alvo: ${parsedPayload.audience}
+
+**IDENTIDADE VISUAL:**
+Personalidade (Vibe): ${parsedPayload.brandVibe.join(', ')}
+Paleta de Cores: ${parsedPayload.colorPalette.join(', ')} (Personalizadas: ${parsedPayload.customColors?.join(', ') || 'N/A'})
+Estilo Visual: ${parsedPayload.visualStyle.join(', ')}
+Tipo de Logo: ${parsedPayload.logoType.join(', ')}
+
+**INSTRUÇÕES PARA OS DOCUMENTOS SOLICITADOS:**
+Para o array JSON "documents", deves gerar os seguintes documentos solicitados, seguindo ESTRITAMENTE as estruturas e requisitos abaixo descritos para cada um:
+${requestedDocsPrompts.length > 0 ? requestedDocsPrompts : 'Nenhum documento adicional solicitado.'}
+
+INSTRUÇÕES DE SAÍDA:
+Retorna EXCLUSIVAMENTE um objeto JSON válido. NÃO DEVOLVAS MAIS NADA (sem backticks markdown de formatação do bloco se possível). O JSON deve ter estritamente a seguinte estrutura:
+{
+  "executiveSummary": {
+    "mission": "Missão impactante",
+    "vision": "Visão de futuro",
+    "valueProposition": "A proposta única de valor (1-2 frases)",
+    "elevatorPitch": "O pitch de vendas rápido"
+  },
+  "targetPersona": {
+    "name": "Nome e profissão fictícia",
+    "demographics": "Idade, localização, rendimento, etc.",
+    "painPoints": ["Dor 1", "Dor 2", "Dor 3"],
+    "goals": ["Objetivo 1", "Objetivo 2"]
+  },
+  "brandIdentity": {
+    "toneOfVoice": "Descrição detalhada do tom de voz",
+    "coreValues": ["Valor 1", "Valor 2", "Valor 3"],
+    "typographySuggestions": "Nomes de fontes (ex: Inter, Playfair)"
+  },
+  "marketingStrategy": {
+    "acquisitionChannels": ["Canal 1", "Canal 2"],
+    "contentPillars": ["Pilar 1", "Pilar 2"],
+    "launchStrategy": "Resumo de como lançar a marca no 1º mês"
+  },
+  "visualPrompts": {
+    "logoPrompt": "Um prompt (EM INGLÊS) extremamente detalhado para o Midjourney/DALL-E gerar o logótipo descrito",
+    "brandbookPrompt": "Um prompt (EM INGLÊS) para gerar a capa do manual de marca"
+  },
+  "documents": {
+    // Insere aqui como chaves exatas os nomes dos documentos solicitados e como valor o conteúdo integral gerado formatado em Markdown, seguindo a estrutura exigida. Se nenhum foi pedido, este objeto deve ser vazio.
+  }
+}`;
+
+        let aiGeneratedPayload = "{}";
+        try {
+            if (parsedPayload.aiModel === 'faundr') {
+                if (process.env.VITE_GEMINI_API_KEY) {
+                    const response = await ai.models.generateContent({
+                        model: 'gemini-3.1-pro',
+                        contents: prompt,
+                    });
+                    aiGeneratedPayload = response.text || "{}";
+                    // Limpar blocos de markdown json se o Gemini os devolver
+                    aiGeneratedPayload = aiGeneratedPayload.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+                } else {
+                    aiGeneratedPayload = JSON.stringify({ error: "Gemini API Key not configured." });
+                }
+            } else if (parsedPayload.aiModel === 'biz') {
+                if (process.env.OPENAI_API_KEY) {
+                    const response = await openai.chat.completions.create({
+                        model: 'gpt-4o-mini',
+                        messages: [{ role: 'user', content: prompt }],
+                        response_format: { type: 'json_object' }
+                    });
+                    aiGeneratedPayload = response.choices[0].message.content || "{}";
+                    aiGeneratedPayload = aiGeneratedPayload.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+                } else {
+                    aiGeneratedPayload = JSON.stringify({ error: "OpenAI API Key not configured." });
+                }
+            }
+        } catch (aiError) {
+            console.error("AI Generation failed:", aiError);
+            aiGeneratedPayload = JSON.stringify({ error: "AI Generation failed." });
+        }
+
+        const savedBusiness = await prisma.business.create({
+            data: {
+                name: parsedPayload.name,
+                niche: JSON.stringify(parsedPayload.niche),
+                visualStyle: parsedPayload.visualStyle.length > 0 ? parsedPayload.visualStyle[0] : 'Indefinido',
+                colorPalette: JSON.stringify({ preset: parsedPayload.colorPalette, custom: parsedPayload.customColors }),
+                aiPayload: aiGeneratedPayload
+            }
+        });
+
+        res.status(201).json(savedBusiness);
+    } catch (error: any) {
+        if (error.errors) {
+            res.status(400).json({ error: "Invalid payload format.", details: error.errors });
+        } else {
+            console.error(error);
+            res.status(500).json({ error: "Internal server error." });
+        }
+    }
+});
+
+app.get('/api/business', async (req: express.Request, res: express.Response) => {
+    try {
+        const businesses = await prisma.business.findMany({
+            orderBy: { createdAt: 'desc' }
+        });
+        
+        const parsedBusinesses = businesses.map((b: Business) => ({
+            ...b,
+            niche: JSON.parse(b.niche),
+            colorPalette: JSON.parse(b.colorPalette),
+            aiPayload: ((): any => { try { return JSON.parse(b.aiPayload); } catch { return b.aiPayload; } })()
+        }));
+
+        res.json(parsedBusinesses);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to fetch businesses." });
+    }
+});
+// ----------------------------------------------------
+// NOVO: Endpoints para Dados Reais
+// ----------------------------------------------------
+
+app.get('/api/courses', async (req, res) => {
+    try {
+        const courses = await prisma.course.findMany({ orderBy: { createdAt: 'desc' } });
+        res.json(courses);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to fetch courses." });
+    }
+});
+
+app.get('/api/products', async (req, res) => {
+    try {
+        const products = await prisma.product.findMany({ orderBy: { createdAt: 'desc' } });
+        res.json(products);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to fetch products." });
+    }
+});
+
+app.get('/api/success-stories', async (req, res) => {
+    try {
+        const stories = await prisma.successStory.findMany({ orderBy: { publishedAt: 'desc' } });
+        res.json(stories);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to fetch success stories." });
+    }
+});
+
+app.get('/api/magazine', async (req, res) => {
+    try {
+        const magazines = await prisma.magazineEdition.findMany({ 
+            orderBy: { releaseDate: 'desc' },
+            select: {
+                id: true,
+                issueNumber: true,
+                title: true,
+                description: true,
+                coverImage: true,
+                releaseDate: true,
+                createdAt: true,
+                // topics excluded: PostgreSQL array column unreliable via PgBouncer
+                // pdfFileUrl excluded: prevent massive payloads
+            }
+        });
+        res.json(magazines);
+    } catch (error) {
+        console.error('GET /api/magazine error:', error);
+        res.status(500).json({ error: "Failed to fetch magazines." });
+    }
+});
+
+app.get('/api/magazine/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const magazine = await prisma.magazineEdition.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                issueNumber: true,
+                title: true,
+                description: true,
+                coverImage: true,
+                pdfFileUrl: true,
+                releaseDate: true,
+                createdAt: true,
+                // topics excluded: PostgreSQL array column unreliable via PgBouncer
+            }
+        });
+        if (!magazine) {
+            return res.status(404).json({ error: "Magazine not found." });
+        }
+        res.json(magazine);
+    } catch (error) {
+        console.error('GET /api/magazine/:id error:', error);
+        res.status(500).json({ error: "Failed to fetch magazine." });
+    }
+});
+
+app.post('/api/upload-pdf', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { base64, filename } = req.body;
+        if (!base64 || !filename) {
+            res.status(400).json({ error: "Missing base64 or filename" });
+            return;
+        }
+
+        const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        const uploadsDir = path.join(__dirname, '../uploads');
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        const ext = path.extname(filename) || '.pdf';
+        const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}${ext}`;
+        const filePath = path.join(uploadsDir, uniqueFilename);
+        
+        fs.writeFileSync(filePath, buffer);
+        
+        const fileUrl = `http://localhost:3001/uploads/${uniqueFilename}`;
+        res.json({ url: fileUrl });
+    } catch (error) {
+        console.error("Upload error:", error);
+        res.status(500).json({ error: "Failed to upload file" });
+    }
+});
+
+app.post('/api/magazine', async (req, res) => {
+    try {
+        const data = req.body;
+        const newMagazine = await prisma.magazineEdition.create({
+            data: {
+                issueNumber: data.issueNumber ? parseInt(data.issueNumber) : 1,
+                title: data.title,
+                description: data.description,
+                topics: data.topics || [],
+                coverImage: data.coverImage,
+                pdfFileUrl: data.pdfFileUrl,
+                releaseDate: data.releaseDate ? new Date(data.releaseDate) : new Date()
+            }
+        });
+        res.status(201).json(newMagazine);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to create magazine." });
+    }
+});
+
+app.put('/api/magazine/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = req.body;
+        
+        const updateData: any = {
+            issueNumber: data.issueNumber ? parseInt(data.issueNumber) : undefined,
+            title: data.title,
+            description: data.description,
+            topics: data.topics,
+            coverImage: data.coverImage,
+            releaseDate: data.releaseDate ? new Date(data.releaseDate) : undefined
+        };
+        
+        if (data.pdfFileUrl && data.pdfFileUrl.trim() !== '') {
+            updateData.pdfFileUrl = data.pdfFileUrl;
+        }
+
+        const updatedMagazine = await prisma.magazineEdition.update({
+            where: { id },
+            data: updateData
+        });
+        res.json(updatedMagazine);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to update magazine." });
+    }
+});
+
+app.delete('/api/magazine/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.magazineEdition.delete({ where: { id } });
+        res.json({ message: "Deleted successfully" });
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to delete magazine." });
+    }
+});
+
+app.get('/api/podcasts', async (req, res) => {
+    try {
+        const podcasts = await prisma.podcastEpisode.findMany({ orderBy: { releaseDate: 'desc' } });
+        res.json(podcasts);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to fetch podcasts." });
+    }
+});
+
+app.get('/api/forge-programs', async (req, res) => {
+    try {
+        const programs = await prisma.faundrForgeProgram.findMany({ orderBy: { startDate: 'asc' } });
+        res.json(programs);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to fetch forge programs." });
+    }
+});
+
+app.get('/api/events', async (req, res) => {
+    try {
+        const events = await prisma.experienceEvent.findMany({ orderBy: { date: 'asc' } });
+        res.json(events);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to fetch events." });
+    }
+});
+
+app.get('/api/mindset', async (req, res) => {
+    try {
+        const tracks = await prisma.mindsetTrack.findMany({ orderBy: { createdAt: 'desc' } });
+        res.json(tracks);
+    } catch (error) {
+        console.error(error); res.status(500).json({ error: "Failed to fetch mindset tracks." });
+    }
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log("✅ Secure Backend running on port " + PORT);
+});

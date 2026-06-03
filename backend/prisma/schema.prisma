@@ -1,0 +1,344 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==========================================
+// 1. SISTEMA CORE & USUÁRIOS
+// ==========================================
+
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  passwordHash     String?
+  name             String
+  role             Role     @default(USER)
+  subscriptionTier String   @default("FREE") // FREE, PRO, ELITE
+  avatarUrl        String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relacionamentos
+  businesses           Business[]
+  enrollments          Enrollment[]
+  orders               Order[]
+  forgeApplications    ForgeApplication[]
+  eventTickets         EventTicket[]
+}
+
+enum Role {
+  USER
+  ADMIN
+  FAUNDR
+}
+
+// ==========================================
+// 2. E-LEARNING (CURSOS)
+// ==========================================
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  instructor  String
+  category    String
+  price       Float
+  oldPrice    Float?
+  coverImage  String?
+  rating      Float    @default(0)
+  level       String
+  duration    String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  modules     Module[]
+  enrollments Enrollment[]
+}
+
+model Module {
+  id          String   @id @default(uuid())
+  courseId    String
+  title       String
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id           String   @id @default(uuid())
+  moduleId     String
+  title        String
+  description  String?
+  videoUrl     String
+  duration     Int      // in minutes
+  order        Int
+  isFreePreview Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  module       Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress     LessonProgress[]
+}
+
+model Enrollment {
+  id          String   @id @default(uuid())
+  userId      String
+  courseId    String
+  progress    Float    @default(0) // percentage
+  enrolledAt  DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model LessonProgress {
+  id          String   @id @default(uuid())
+  userId      String
+  lessonId    String
+  completed   Boolean  @default(false)
+  lastWatchedAt DateTime @default(now())
+
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// 3. E-COMMERCE (LOJA E LIVROS)
+// ==========================================
+
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  format      ProductFormat
+  coverImage  String?
+  fileUrl     String?  // for digital products
+  stock       Int?     // for physical products
+  category    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+}
+
+enum ProductFormat {
+  DIGITAL
+  PHYSICAL
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  userId      String
+  total       Float
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       OrderItem[]
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  productId   String
+  price       Float
+  quantity    Int      @default(1)
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+}
+
+// ==========================================
+// 4. CONTEÚDO EDITORIAL & MÍDIA
+// ==========================================
+
+model SuccessStory {
+  id               String   @id @default(uuid())
+  title            String
+  entrepreneurName String
+  content          String   // HTML or Markdown
+  coverImage       String?
+  publishedAt      DateTime @default(now())
+}
+
+model MagazineEdition {
+  id          String   @id @default(uuid())
+  issueNumber Int      @unique
+  title       String
+  description String?
+  topics      String[] @default([])
+  coverImage  String?
+  pdfFileUrl  String
+  releaseDate DateTime
+  createdAt   DateTime @default(now())
+
+  articles    MagazineArticle[]
+}
+
+model MagazineArticle {
+  id          String   @id @default(uuid())
+  editionId   String
+  title       String
+  author      String
+  content     String   // HTML or Markdown
+
+  edition     MagazineEdition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+}
+
+model PodcastEpisode {
+  id          String   @id @default(uuid())
+  title       String
+  guestName   String
+  description String
+  audioUrl    String?
+  videoUrl    String?
+  duration    String
+  showNotes   String?
+  releaseDate DateTime
+  createdAt   DateTime @default(now())
+}
+
+// ==========================================
+// 5. ECOSSISTEMA FAUNDR (INCUBAÇÃO E EVENTOS)
+// ==========================================
+
+model FaundrForgeProgram {
+  id          String   @id @default(uuid())
+  name        String
+  cohort      String
+  description String
+  startDate   DateTime
+  endDate     DateTime?
+  status      String   // OPEN, ACTIVE, CLOSED
+  createdAt   DateTime @default(now())
+
+  applications ForgeApplication[]
+}
+
+model ForgeApplication {
+  id          String   @id @default(uuid())
+  userId      String
+  programId   String
+  pitchDeckUrl String?
+  status      ApplicationStatus @default(PENDING)
+  feedback    String?
+  appliedAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program     FaundrForgeProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWING
+  ACCEPTED
+  REJECTED
+}
+
+model ExperienceEvent {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  location    String
+  date        DateTime
+  ticketPrice Float
+  capacity    Int
+  coverImage  String?
+  createdAt   DateTime @default(now())
+
+  tickets     EventTicket[]
+}
+
+model EventTicket {
+  id          String   @id @default(uuid())
+  eventId     String
+  userId      String
+  qrCode      String   @unique
+  status      TicketStatus @default(VALID)
+  purchasedAt DateTime @default(now())
+
+  event       ExperienceEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum TicketStatus {
+  VALID
+  USED
+  CANCELLED
+}
+
+// ==========================================
+// 6. MINDSET & RECURSOS
+// ==========================================
+
+model MindsetTrack {
+  id          String   @id @default(uuid())
+  title       String
+  audioUrl    String
+  duration    String
+  category    String   // MOTIVATION, DISCIPLINE, etc.
+  createdAt   DateTime @default(now())
+}
+
+model DailyQuote {
+  id          String   @id @default(uuid())
+  quote       String
+  author      String
+  displayDate DateTime @unique
+}
+
+model Resource {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  type        ResourceType
+  fileUrl     String
+  category    String
+  createdAt   DateTime @default(now())
+}
+
+enum ResourceType {
+  PDF
+  TEMPLATE
+  SPREADSHEET
+  TOOL
+}
+
+// ==========================================
+// 7. BISNOTEKA (GERADOR IA DE NEGÓCIOS)
+// ==========================================
+
+model Business {
+  id           String   @id @default(uuid())
+  userId       String?  // Made optional for backward compatibility during migration, should be required later
+  name         String
+  niche        String   // JSON string
+  visualStyle  String
+  colorPalette String   // JSON string
+  status       String   @default("Gerado pela IA")
+  aiPayload    String   // JSON string from AI
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
