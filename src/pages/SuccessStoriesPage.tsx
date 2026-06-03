@@ -19,7 +19,7 @@ const SuccessStoriesPage: React.FC = () => {
     useEffect(() => {
         const fetchStories = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/success-stories');
+                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/success-stories`);
                 if (res.ok) {
                     const data = await res.json();
                     const formatted = data.map((s: any) => ({

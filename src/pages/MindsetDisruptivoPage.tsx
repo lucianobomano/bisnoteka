@@ -35,7 +35,7 @@ const MindsetDisruptivoPage: React.FC = () => {
     useEffect(() => {
         const fetchTracks = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/mindset');
+                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/mindset`);
                 if (res.ok) {
                     const data = await res.json();
                     setTracks(data);

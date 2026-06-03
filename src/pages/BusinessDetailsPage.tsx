@@ -59,7 +59,7 @@ const BusinessDetailsPage: React.FC = () => {
     };
 
     useEffect(() => {
-        fetch(`http://localhost:3001/api/business`)
+        fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/business`)
             .then(res => res.json())
             .then(data => {
                 const found = data.find((b: BusinessDetails) => b.id === id);

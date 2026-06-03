@@ -14,6 +14,12 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient(
+    process.env.SUPABASE_URL || "YOUR_SUPABASE_URL",
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "YOUR_SUPABASE_KEY"
+);
+
 const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY || "YOUR_API_KEY" });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "YOUR_API_KEY" });
 
@@ -283,22 +289,28 @@ app.post('/api/upload-pdf', async (req: express.Request, res: express.Response):
         const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
         const buffer = Buffer.from(base64Data, 'base64');
         
-        const uploadsDir = path.join(__dirname, '../uploads');
-        if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-
         const ext = path.extname(filename) || '.pdf';
         const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}${ext}`;
-        const filePath = path.join(uploadsDir, uniqueFilename);
         
-        fs.writeFileSync(filePath, buffer);
-        
-        const fileUrl = `http://localhost:3001/uploads/${uniqueFilename}`;
-        res.json({ url: fileUrl });
+        const { data, error } = await supabase.storage
+            .from('magazines')
+            .upload(uniqueFilename, buffer, {
+                contentType: 'application/pdf',
+                upsert: false
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+            .from('magazines')
+            .getPublicUrl(uniqueFilename);
+
+        res.json({ url: publicUrlData.publicUrl });
     } catch (error) {
         console.error("Upload error:", error);
-        res.status(500).json({ error: "Failed to upload file" });
+        res.status(500).json({ error: "Failed to upload file to Supabase Storage" });
     }
 });
 
@@ -397,6 +409,10 @@ app.get('/api/mindset', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log("✅ Secure Backend running on port " + PORT);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log("✅ Secure Backend running on port " + PORT);
+    });
+}
+
+export default app;

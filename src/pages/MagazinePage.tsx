@@ -33,7 +33,7 @@ const MagazinePage: React.FC = () => {
     React.useEffect(() => {
         const fetchMagazines = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/magazine');
+                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine`);
                 if (res.ok) {
                     const data = await res.json();
                     if (Array.isArray(data)) {

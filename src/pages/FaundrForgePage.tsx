@@ -9,7 +9,7 @@ const FaundrForgePage: React.FC = () => {
     React.useEffect(() => {
         const fetchPrograms = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/forge-programs');
+                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/forge-programs`);
                 if (res.ok) {
                     const data = await res.json();
                     const formatted = data.map((p: any) => ({

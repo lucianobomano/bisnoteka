@@ -199,7 +199,7 @@ const MagazineReaderPage: React.FC = () => {
   useEffect(() => {
     const fetchMagazine = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/magazine/${id}`);
+        const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine/${id}`);
         if (!res.ok) {
           const body = await res.text();
           setError(`HTTP ${res.status}: ${body}`);

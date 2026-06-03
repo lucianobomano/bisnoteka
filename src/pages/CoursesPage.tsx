@@ -23,7 +23,7 @@ const CoursesPage: React.FC = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/courses');
+                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/courses`);
                 if (res.ok) {
                     const data = await res.json();
                     const formatted = data.map((c: any) => ({
