@@ -103,7 +103,7 @@ const FaundrForgePage: React.FC = () => {
                             </p>
 
                             <div className="flex flex-wrap gap-4 mb-16">
-                                {tool.specs.map((spec, idx) => (
+                                {tool.specs.map((spec: string, idx: number) => (
                                     <span key={idx} className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold text-white/50 group-hover:text-white transition-colors">
                                         {spec}
                                     </span>

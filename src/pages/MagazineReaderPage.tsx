@@ -405,6 +405,10 @@ const MagazineReaderPage: React.FC = () => {
                 clickEventForward={true}
                 useMouseEvents={true}
                 renderOnlyPageLengthChange={false}
+                startZIndex={0}
+                autoSize={true}
+                showPageCorners={true}
+                disableFlipByClick={false}
               >
                 {flipBookPages}
               </HTMLFlipBook>
