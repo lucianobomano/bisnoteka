@@ -305,9 +305,9 @@ app.post('/api/upload-pdf-url', async (req: express.Request, res: express.Respon
             signedUrl: data.signedUrl,
             publicUrl: publicUrlData.publicUrl 
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Upload URL error:", error);
-        res.status(500).json({ error: "Failed to generate upload URL" });
+        res.status(500).json({ error: error.message || "Failed to generate upload URL" });
     }
 });
 

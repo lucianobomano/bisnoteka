@@ -61,7 +61,8 @@ export default function AdminMagazineTab() {
                 });
 
                 if (!urlRes.ok) {
-                    throw new Error('Falha ao obter permissão para envio do arquivo.');
+                    const errorData = await urlRes.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Falha ao obter permissão para envio do arquivo no Supabase.');
                 }
 
                 const urlData = await urlRes.json();
