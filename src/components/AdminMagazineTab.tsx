@@ -53,26 +53,33 @@ export default function AdminMagazineTab() {
 
             // If a new PDF file is selected, upload it first
             if (pdfFile) {
-                // Read file as base64 first to send to upload endpoint
-                const base64 = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result as string);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(pdfFile);
-                });
-
-                const uploadRes = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/upload-pdf`, {
+                // Get signed upload URL from our backend
+                const urlRes = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/upload-pdf-url`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ base64, filename: pdfFile.name })
+                    body: JSON.stringify({ filename: pdfFile.name })
+                });
+
+                if (!urlRes.ok) {
+                    throw new Error('Falha ao obter permissão para envio do arquivo.');
+                }
+
+                const urlData = await urlRes.json();
+                
+                // Upload directly to Supabase
+                const uploadRes = await fetch(urlData.signedUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/pdf'
+                    },
+                    body: pdfFile
                 });
 
                 if (!uploadRes.ok) {
-                    throw new Error('Falha ao enviar o arquivo PDF para o servidor.');
+                    throw new Error('Falha ao enviar o arquivo PDF para o servidor de armazenamento.');
                 }
 
-                const uploadData = await uploadRes.json();
-                finalPdfUrl = uploadData.url;
+                finalPdfUrl = urlData.publicUrl;
             }
 
             const url = isEditing 

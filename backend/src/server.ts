@@ -278,26 +278,20 @@ app.get('/api/magazine/:id', async (req, res) => {
     }
 });
 
-app.post('/api/upload-pdf', async (req: express.Request, res: express.Response): Promise<void> => {
+app.post('/api/upload-pdf-url', async (req: express.Request, res: express.Response): Promise<void> => {
     try {
-        const { base64, filename } = req.body;
-        if (!base64 || !filename) {
-            res.status(400).json({ error: "Missing base64 or filename" });
+        const { filename } = req.body;
+        if (!filename) {
+            res.status(400).json({ error: "Missing filename" });
             return;
         }
 
-        const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
-        const buffer = Buffer.from(base64Data, 'base64');
-        
         const ext = path.extname(filename) || '.pdf';
         const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}${ext}`;
         
         const { data, error } = await supabase.storage
             .from('magazines')
-            .upload(uniqueFilename, buffer, {
-                contentType: 'application/pdf',
-                upsert: false
-            });
+            .createSignedUploadUrl(uniqueFilename);
 
         if (error) {
             throw error;
@@ -305,12 +299,15 @@ app.post('/api/upload-pdf', async (req: express.Request, res: express.Response):
 
         const { data: publicUrlData } = supabase.storage
             .from('magazines')
-            .getPublicUrl(uniqueFilename);
+            .getPublicUrl(data.path);
 
-        res.json({ url: publicUrlData.publicUrl });
+        res.json({ 
+            signedUrl: data.signedUrl,
+            publicUrl: publicUrlData.publicUrl 
+        });
     } catch (error) {
-        console.error("Upload error:", error);
-        res.status(500).json({ error: "Failed to upload file to Supabase Storage" });
+        console.error("Upload URL error:", error);
+        res.status(500).json({ error: "Failed to generate upload URL" });
     }
 });
 
