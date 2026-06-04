@@ -61,8 +61,8 @@ export default function AdminMagazineTab() {
                 });
 
                 if (!urlRes.ok) {
-                    const errorData = await urlRes.json().catch(() => ({}));
-                    throw new Error(errorData.error || 'Falha ao obter permissão para envio do arquivo no Supabase.');
+                    const textData = await urlRes.text();
+                    throw new Error(`Erro Servidor (${urlRes.status}): ${textData.substring(0, 150)}...`);
                 }
 
                 const urlData = await urlRes.json();
