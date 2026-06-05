@@ -30,7 +30,6 @@ app.use(cors({
     allowedHeaders: ['Content-Type']
 }));
 app.use(express.json({ limit: '100mb' }));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 const businessPayloadSchema = z.object({
     name: z.string().min(1).max(100),
