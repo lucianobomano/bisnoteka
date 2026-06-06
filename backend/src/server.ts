@@ -228,6 +228,10 @@ app.get('/api/success-stories', async (req, res) => {
     }
 });
 
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
 app.get('/api/magazine', async (req, res) => {
     try {
         const magazines = await prisma.magazineEdition.findMany({ 
