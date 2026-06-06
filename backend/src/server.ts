@@ -15,10 +15,11 @@ const app = express();
 const prisma = new PrismaClient();
 
 import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(
-    process.env.SUPABASE_URL || "YOUR_SUPABASE_URL",
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "YOUR_SUPABASE_KEY"
-);
+const supabaseUrl = process.env.SUPABASE_URL && process.env.SUPABASE_URL !== 'YOUR_SUPABASE_URL'
+    ? process.env.SUPABASE_URL
+    : 'https://bcobyuxjbbxpgituacai.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_KEY';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY || "YOUR_API_KEY" });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "YOUR_API_KEY" });
