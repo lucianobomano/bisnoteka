@@ -8,7 +8,7 @@ const Resources: React.FC = () => {
     React.useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`);
                 if (res.ok) {
                     const data = await res.json();
                     setBooks(data.slice(0, 3));
@@ -19,7 +19,7 @@ const Resources: React.FC = () => {
         };
         const fetchPodcasts = async () => {
             try {
-                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/podcasts`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/podcasts`);
                 if (res.ok) {
                     const data = await res.json();
                     setPodcasts(data.slice(0, 2));

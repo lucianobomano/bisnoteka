@@ -13,7 +13,7 @@ const FaundrExperiencePage: React.FC = () => {
     React.useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/events`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/events`);
                 if (res.ok) {
                     const data = await res.json();
                     setEvents(data);

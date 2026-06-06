@@ -33,7 +33,7 @@ const PodcastsPage: React.FC = () => {
     useEffect(() => {
         const fetchPodcasts = async () => {
             try {
-                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/podcasts`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/podcasts`);
                 if (res.ok) {
                     const data = await res.json();
                     const formatted = data.map((p: any) => ({

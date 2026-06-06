@@ -29,7 +29,7 @@ export default function AdminMagazineTab() {
     const fetchMagazines = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine`);
             const data = await res.json();
             if (Array.isArray(data)) {
                 setMagazines(data);
@@ -54,7 +54,7 @@ export default function AdminMagazineTab() {
             // If a new PDF file is selected, upload it first
             if (pdfFile) {
                 // Get signed upload URL from our backend
-                const urlRes = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/upload-pdf-url`, {
+                const urlRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/upload-pdf-url`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ filename: pdfFile.name })
@@ -84,8 +84,8 @@ export default function AdminMagazineTab() {
             }
 
             const url = isEditing 
-                ? `\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine/${editingMagazine.id}`
-                : `\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine`;
+                ? `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine/${editingMagazine.id}`
+                : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine`;
                 
             const method = isEditing ? 'PUT' : 'POST';
 
@@ -125,7 +125,7 @@ export default function AdminMagazineTab() {
     const confirmDelete = async () => {
         if (!magazineToDelete) return;
         try {
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine/${magazineToDelete}`, { method: 'DELETE' });
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/magazine/${magazineToDelete}`, { method: 'DELETE' });
             if (res.ok) {
                 setMagazineToDelete(null);
                 fetchMagazines();

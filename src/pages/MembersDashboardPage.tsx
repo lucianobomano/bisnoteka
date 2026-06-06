@@ -24,7 +24,7 @@ const MembersDashboardPage: React.FC = () => {
     React.useEffect(() => {
         if (activeTab === 'negocios') {
             setIsLoading(true);
-            fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/business`)
+            fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/business`)
                 .then(res => res.json())
                 .then(data => {
                     setRealBusinesses(data);
@@ -38,7 +38,7 @@ const MembersDashboardPage: React.FC = () => {
     }, [activeTab]);
 
     React.useEffect(() => {
-        fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/courses`)
+        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/courses`)
             .then(res => res.json())
             .then(data => {
                 const formatted = data.slice(0, 2).map((c: any, index: number) => ({

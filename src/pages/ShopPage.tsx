@@ -39,7 +39,7 @@ const ShopPage: React.FC = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`);
                 if (response.ok) {
                     const data = await response.json();
                     const formattedProducts = data.map((p: any) => ({
