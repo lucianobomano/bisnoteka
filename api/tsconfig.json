@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": false,
-    "moduleResolution": "node"
+    "strict": false
   },
   "files": ["index.ts"]
 }
