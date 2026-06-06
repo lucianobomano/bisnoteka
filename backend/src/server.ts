@@ -12,7 +12,16 @@ import path from 'path';
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
+
+let _prisma: PrismaClient | null = null;
+const prisma = new Proxy({} as PrismaClient, {
+    get(target, prop) {
+        if (!_prisma) {
+            _prisma = new PrismaClient();
+        }
+        return (_prisma as any)[prop];
+    }
+});
 
 import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.SUPABASE_URL && process.env.SUPABASE_URL !== 'YOUR_SUPABASE_URL'
