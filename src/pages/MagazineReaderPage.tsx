@@ -128,6 +128,7 @@ const MagazineReaderPage: React.FC = () => {
   const [pdfFile, setPdfFile] = useState<string | null>(null);
   const [pageWidth, setPageWidth] = useState<number>(500);
   const [pageHeight, setPageHeight] = useState<number>(600);
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
 
   const flipBookRef = useRef<any>(null);
 
@@ -171,10 +172,14 @@ const MagazineReaderPage: React.FC = () => {
   // Calculate pages dimensions dynamically to fit viewport while preserving aspect ratio (A4)
   useEffect(() => {
     const calc = () => {
-      const containerWidth = window.innerWidth - 64;
-      const containerHeight = window.innerHeight - 200; // safe area for headers and footers
+      const width = window.innerWidth;
+      const isMob = width < 768;
+      setIsMobile(isMob);
+
+      const containerWidth = width - (isMob ? 16 : 64);
+      const containerHeight = window.innerHeight - (isMob ? 160 : 200); // safe area for headers and footers
       const aspectRatio = 210 / 297; // A4 aspect ratio (width / height)
-      const bookAspectRatio = 2 * aspectRatio;
+      const bookAspectRatio = isMob ? aspectRatio : (2 * aspectRatio);
 
       let bookWidth, bookHeight;
       if (containerWidth / containerHeight > bookAspectRatio) {
@@ -187,7 +192,7 @@ const MagazineReaderPage: React.FC = () => {
         bookHeight = bookWidth / bookAspectRatio;
       }
 
-      setPageWidth(Math.floor(bookWidth / 2));
+      setPageWidth(Math.floor(isMob ? bookWidth : (bookWidth / 2)));
       setPageHeight(Math.floor(bookHeight));
     };
     calc();
@@ -353,13 +358,24 @@ const MagazineReaderPage: React.FC = () => {
           onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
         >
           <X size={24} />
-          <span style={{ fontWeight: 'bold', display: 'inline' }}>Sair do Leitor</span>
+          {!isMobile && <span style={{ fontWeight: 'bold' }}>Sair do Leitor</span>}
         </button>
-        <div style={{ color: 'white', fontWeight: 'bold', letterSpacing: '0.1em', fontSize: 14, textTransform: 'uppercase' }}>
+        <div style={{
+          color: 'white',
+          fontWeight: 'bold',
+          letterSpacing: '0.05em',
+          fontSize: isMobile ? 12 : 14,
+          textTransform: 'uppercase',
+          maxWidth: isMobile ? '50%' : '60%',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          textAlign: 'center'
+        }}>
           {magazine.title}
         </div>
-        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
-          {numPages > 0 ? `Página ${currentPage + 1} de ${numPages}` : ''}
+        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: isMobile ? 12 : 14 }}>
+          {numPages > 0 ? `${currentPage + 1}/${numPages}` : ''}
         </div>
       </div>
 
@@ -383,23 +399,24 @@ const MagazineReaderPage: React.FC = () => {
           >
             {numPages > 0 && flipBookPages && (
               <HTMLFlipBook
+                key={isMobile ? 'mobile' : 'desktop'}
                 ref={flipBookRef}
                 width={pageWidth}
                 height={pageHeight}
                 size="fixed"
-                minWidth={315}
+                minWidth={isMobile ? 150 : 315}
                 maxWidth={2000}
-                minHeight={400}
+                minHeight={isMobile ? 200 : 400}
                 maxHeight={2000}
                 maxShadowOpacity={0.5}
-                showCover={true}
-                mobileScrollSupport={false}
+                showCover={!isMobile}
+                mobileScrollSupport={true}
                 onFlip={(e: any) => setCurrentPage(e.data)}
                 className="flip-book shadow-2xl"
                 style={{ margin: '0 auto' }}
                 drawShadow={true}
                 flippingTime={1000}
-                usePortrait={false}
+                usePortrait={isMobile}
                 startPage={0}
                 swipeDistance={30}
                 clickEventForward={true}
