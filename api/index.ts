@@ -23,14 +23,34 @@ const prisma = new Proxy({} as PrismaClient, {
 });
 
 import { createClient } from '@supabase/supabase-js';
-const supabaseUrl = process.env.SUPABASE_URL && process.env.SUPABASE_URL !== 'YOUR_SUPABASE_URL'
-    ? process.env.SUPABASE_URL
-    : 'https://bcobyuxjbbxpgituacai.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_KEY';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
-const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY || "YOUR_API_KEY" });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "YOUR_API_KEY" });
+let _supabase: any = null;
+const getSupabase = () => {
+    if (!_supabase) {
+        const url = process.env.SUPABASE_URL && process.env.SUPABASE_URL !== 'YOUR_SUPABASE_URL'
+            ? process.env.SUPABASE_URL
+            : 'https://bcobyuxjbbxpgituacai.supabase.co';
+        const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_KEY';
+        _supabase = createClient(url, key);
+    }
+    return _supabase;
+};
+
+let _ai: any = null;
+const getAI = () => {
+    if (!_ai) {
+        _ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY || "YOUR_API_KEY" });
+    }
+    return _ai;
+};
+
+let _openai: any = null;
+const getOpenAI = () => {
+    if (!_openai) {
+        _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "YOUR_API_KEY" });
+    }
+    return _openai;
+};
 
 app.use(helmet());
 app.use(cors({
@@ -138,7 +158,7 @@ Retorna EXCLUSIVAMENTE um objeto JSON válido. NÃO DEVOLVAS MAIS NADA (sem back
         try {
             if (parsedPayload.aiModel === 'faundr') {
                 if (process.env.VITE_GEMINI_API_KEY) {
-                    const response = await ai.models.generateContent({
+                    const response = await getAI().models.generateContent({
                         model: 'gemini-3.1-pro',
                         contents: prompt,
                     });
@@ -149,7 +169,7 @@ Retorna EXCLUSIVAMENTE um objeto JSON válido. NÃO DEVOLVAS MAIS NADA (sem back
                 }
             } else if (parsedPayload.aiModel === 'biz') {
                 if (process.env.OPENAI_API_KEY) {
-                    const response = await openai.chat.completions.create({
+                    const response = await getOpenAI().chat.completions.create({
                         model: 'gpt-4o-mini',
                         messages: [{ role: 'user', content: prompt }],
                         response_format: { type: 'json_object' }
@@ -295,7 +315,7 @@ app.post('/api/upload-pdf-url', async (req: express.Request, res: express.Respon
         const ext = path.extname(filename) || '.pdf';
         const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}${ext}`;
         
-        const { data, error } = await supabase.storage
+        const { data, error } = await getSupabase().storage
             .from('magazines')
             .createSignedUploadUrl(uniqueFilename);
 
@@ -303,7 +323,7 @@ app.post('/api/upload-pdf-url', async (req: express.Request, res: express.Respon
             throw error;
         }
 
-        const { data: publicUrlData } = supabase.storage
+        const { data: publicUrlData } = getSupabase().storage
             .from('magazines')
             .getPublicUrl(data.path);
 
