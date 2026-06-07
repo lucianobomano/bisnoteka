@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState(false);
+  const [hoveredGoogle, setHoveredGoogle] = useState(false);
+  const [hoveredApple, setHoveredApple] = useState(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -38,44 +44,129 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080d14] flex flex-col justify-center items-center px-4 relative overflow-hidden font-['Roboto']">
-      {/* Background gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-red-900/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-950/10 blur-[120px] pointer-events-none" />
-      
-      <div className="w-full max-w-md z-10">
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#0c1219',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '24px 16px',
+      position: 'relative',
+      overflow: 'hidden',
+      fontFamily: "'Roboto', sans-serif",
+      color: '#fff'
+    }}>
+      <style>{`
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: #ffffff !important;
+          transition: background-color 5000s ease-in-out 0s;
+          box-shadow: inset 0 0 20px 20px #0a0f16 !important;
+        }
+      `}</style>
+
+      {/* Dynamic Glowing Ambient Blobs */}
+      <div style={{
+        position: 'absolute',
+        top: '-15%',
+        left: '-10%',
+        width: '600px',
+        height: '600px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(248,56,33,0.08) 0%, rgba(248,56,33,0) 70%)',
+        filter: 'blur(80px)',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-15%',
+        right: '-10%',
+        width: '600px',
+        height: '600px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(0,17,253,0.06) 0%, rgba(0,17,253,0) 70%)',
+        filter: 'blur(80px)',
+        pointerEvents: 'none'
+      }} />
+
+      <div style={{ width: '100%', maxWidth: '440px', zIndex: 10 }}>
         {/* Header/Logo */}
-        <div className="text-center mb-8 flex flex-col items-center">
-          <Link to="/">
-            <img src="/LOGO H.svg" alt="Bisnoteka" className="h-8 mb-4" />
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <Link to="/" style={{ display: 'inline-block', transition: 'transform 0.3s ease' }}>
+            <img src="/LOGO H.svg" alt="Bisnoteka" style={{ height: '32px', marginBottom: '12px' }} />
           </Link>
-          <p className="text-gray-400 text-sm">O motor de inteligência e conhecimento do empreendedor</p>
+          <p style={{ color: '#8892b0', fontSize: '14px', letterSpacing: '0.5px' }}>O motor de inteligência e conhecimento do fundador</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-[#10171f]/80 border border-white/5 rounded-2xl p-8 shadow-2xl backdrop-blur-md">
-          <h2 className="text-2xl font-semibold text-white mb-2">Entrar na sua conta</h2>
-          <p className="text-gray-400 text-sm mb-6">Aceda à sua área de membros, ferramentas e cursos</p>
+        {/* Form Card */}
+        <div style={{
+          backgroundColor: 'rgba(16, 23, 31, 0.75)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          borderRadius: '24px',
+          padding: '40px 32px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+        }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#fff', marginBottom: '6px', letterSpacing: '-0.5px' }}>Bem-vindo de volta</h2>
+          <p style={{ color: '#8892b0', fontSize: '14px', marginBottom: '24px' }}>Insira os seus dados de acesso à plataforma.</p>
 
           {error && (
-            <div className="mb-6 bg-red-950/40 border border-red-500/30 text-red-200 text-sm rounded-lg p-3 flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 mt-0.5 text-red-400 flex-shrink-0" />
+            <div style={{
+              marginBottom: '24px',
+              backgroundColor: 'rgba(239, 68, 68, 0.06)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              color: '#fca5a5',
+              fontSize: '14px',
+              borderRadius: '12px',
+              padding: '14px',
+              display: 'flex',
+              alignItems: 'start',
+              gap: '12px'
+            }}>
+              <AlertCircle size={18} style={{ color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">E-mail</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                  <Mail className="w-5 h-5" />
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#8892b0', uppercase: 'true', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>E-mail</label>
+              <div style={{ position: 'relative' }}>
+                <span style={{
+                  position: 'absolute',
+                  insetY: 0,
+                  left: '14px',
+                  top: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: emailFocused ? '#f83821' : '#4b5563',
+                  transition: 'color 0.3s ease'
+                }}>
+                  <Mail size={16} />
                 </span>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-[#0c1219]/90 border border-white/10 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-red-500 transition-colors"
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 14px 14px 42px',
+                    backgroundColor: '#0a0f16',
+                    border: emailFocused ? '1px solid rgba(248, 56, 33, 0.5)' : '1px solid rgba(255, 255, 255, 0.05)',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxShadow: emailFocused ? '0 0 15px rgba(248, 56, 33, 0.12)' : 'none',
+                    transition: 'all 0.3s ease'
+                  }}
                   placeholder="seuemail@exemplo.com"
                   required
                 />
@@ -83,46 +174,171 @@ const LoginPage: React.FC = () => {
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Palavra-passe</label>
-                <a href="#" className="text-xs text-red-400 hover:text-red-300 hover:underline">Esqueceu-se?</a>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#8892b0', textTransform: 'uppercase', letterSpacing: '1px' }}>Palavra-passe</label>
+                <a href="#" style={{ fontSize: '12px', color: '#f83821', textDecoration: 'none', fontWeight: 500 }}>Esqueceu-se?</a>
               </div>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                  <Lock className="w-5 h-5" />
+              <div style={{ position: 'relative' }}>
+                <span style={{
+                  position: 'absolute',
+                  insetY: 0,
+                  left: '14px',
+                  top: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: passwordFocused ? '#f83821' : '#4b5563',
+                  transition: 'color 0.3s ease'
+                }}>
+                  <Lock size={16} />
                 </span>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-[#0c1219]/90 border border-white/10 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-red-500 transition-colors"
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => passwordFocused ? setPasswordFocused(false) : setPasswordFocused(false)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 42px 14px 42px',
+                    backgroundColor: '#0a0f16',
+                    border: passwordFocused ? '1px solid rgba(248, 56, 33, 0.5)' : '1px solid rgba(255, 255, 255, 0.05)',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxShadow: passwordFocused ? '0 0 15px rgba(248, 56, 33, 0.12)' : 'none',
+                    transition: 'all 0.3s ease'
+                  }}
                   placeholder="••••••••"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '14px',
+                    top: '14px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: '#4b5563',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold rounded-xl text-sm flex justify-center items-center gap-2 transition-all shadow-lg shadow-red-950/20 disabled:opacity-50 cursor-pointer"
+              onMouseEnter={() => setHoveredButton(true)}
+              onMouseLeave={() => setHoveredButton(false)}
+              style={{
+                width: '100%',
+                padding: '15px',
+                background: hoveredButton ? 'linear-gradient(135deg, #ff4c36 0%, #e22b15 100%)' : 'linear-gradient(135deg, #f83821 0%, #d6220e 100%)',
+                color: '#fff',
+                fontSize: '14px',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: hoveredButton ? '0 8px 24px rgba(248, 56, 33, 0.3)' : '0 4px 14px rgba(248, 56, 33, 0.2)',
+                transform: hoveredButton ? 'translateY(-1px)' : 'none',
+                transition: 'all 0.3s ease',
+                opacity: loading ? 0.6 : 1
+              }}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div style={{ width: '20px', height: '20px', border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin"></div>
               ) : (
                 <>
                   Entrar na Plataforma
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>
           </form>
+
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0' }}>
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.05)' }}></div>
+            <span style={{ fontSize: '11px', color: '#4b5563', padding: '0 12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>ou continuar com</span>
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.05)' }}></div>
+          </div>
+
+          {/* Social Logins */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <button
+              type="button"
+              onMouseEnter={() => setHoveredGoogle(true)}
+              onMouseLeave={() => setHoveredGoogle(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                padding: '12px',
+                backgroundColor: hoveredGoogle ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.01)',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <svg style={{ width: '16px', height: '16px' }} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <g transform="matrix(1, 0, 0, 1, 0, 0)">
+                  <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.56h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.4C21.68,11.96 21.56,11.5 21.35,11.1z" fill="#4285F4" />
+                  <path d="M12,20.9c2.4,0 4.4,-0.8 5.88,-2.16l-3.3,-2.56c-0.9,0.6 -2.06,0.96 -3.24,0.96 -2.3,0 -4.24,-1.55 -4.94,-3.64H2.94v2.64C4.42,18.8 8,20.9 12,20.9z" fill="#34A853" />
+                  <path d="M7.06,13.5c-0.18,-0.54 -0.28,-1.12 -0.28,-1.7s0.1,-1.16 0.28,-1.7V7.46H2.94C2.33,8.68 2,10.06 2,11.8s0.33,3.12 0.94,4.34L7.06,13.5z" fill="#FBBC05" />
+                  <path d="M12,6.76c1.3,0 2.48,0.45 3.4,1.32l2.56,-2.56C16.4,4.04 14.4,3.2 12,3.2c-4,0 -7.58,2.1 -9.06,5.34l4.12,3.2c0.7,-2.09 2.64,-3.64 4.94,-3.64z" fill="#EA4335" />
+                </g>
+              </svg>
+              Google
+            </button>
+            <button
+              type="button"
+              onMouseEnter={() => setHoveredApple(true)}
+              onMouseLeave={() => setHoveredApple(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                padding: '12px',
+                backgroundColor: hoveredApple ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.01)',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <svg style={{ width: '14px', height: '14px', fill: '#fff' }} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.2.67-2.92 1.51-.61.73-1.14 1.87-1 2.98 1.11.09 2.24-.59 2.93-1.43z" />
+              </svg>
+              Apple
+            </button>
+          </div>
         </div>
 
         {/* Footer info */}
-        <p className="text-center text-gray-500 text-xs mt-8">
+        <p style={{ textAlign: 'center', color: '#4b5563', fontSize: '13px', marginTop: '32px' }}>
           Não tem uma conta?{' '}
-          <Link to="/cadastro" className="text-red-400 hover:text-red-300 font-semibold hover:underline">
+          <Link to="/cadastro" style={{ color: '#f83821', textDecoration: 'none', fontWeight: 600 }}>
             Registe-se gratuitamente
           </Link>
         </p>
