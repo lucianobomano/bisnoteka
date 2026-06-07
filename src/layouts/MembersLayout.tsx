@@ -21,8 +21,8 @@ const MembersLayout: React.FC = () => {
             
             {/* Mobile Header */}
             <div className="members-mobile-header">
-                <Link to="/" style={{ height: '32px' }}>
-                    <img src="/media/BISNOTEKA_LOGO.png" alt="Bisnoteka" style={{ height: '100%', objectFit: 'contain' }} />
+                <Link to="/" style={{ height: '24px' }}>
+                    <img src="/LOGO H.svg" alt="Bisnoteka" style={{ height: '100%', objectFit: 'contain' }} />
                 </Link>
                 <div>
                     <button onClick={() => setSidebarOpen(true)} style={{ background: 'transparent', border: 'none', color: '#fff' }}>
@@ -50,8 +50,8 @@ const MembersLayout: React.FC = () => {
             {/* Sidebar */}
             <div className={`members-sidebar ${sidebarOpen ? 'open-mobile' : 'closed-mobile'}`}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-                    <Link to="/membros" style={{ height: '32px', display: 'block' }}>
-                        <img src="/media/BISNOTEKA_LOGO.png" alt="Bisnoteka" style={{ height: '100%', objectFit: 'contain' }} />
+                    <Link to="/membros" style={{ height: '24px', display: 'block' }}>
+                        <img src="/LOGO H.svg" alt="Bisnoteka" style={{ height: '100%', objectFit: 'contain' }} />
                     </Link>
                     <button onClick={() => setSidebarOpen(false)} className="hide-desktop" style={{ background: 'transparent', border: 'none', color: '#fff' }}>
                         <X size={24} />

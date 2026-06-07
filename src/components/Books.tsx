@@ -33,7 +33,7 @@ const Books: React.FC<BooksProps> = () => {
                     const formatted = data.map((b: any, idx: number) => ({
                         id: b.id,
                         title: b.title,
-                        author: 'FAUNDR AUTHOR',
+                        author: b.author || 'FAUNDR AUTHOR',
                         price: b.price.toString(),
                         oldPrice: (b.price * 1.5).toString(),
                         rating: 5,

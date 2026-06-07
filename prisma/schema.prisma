@@ -120,6 +120,7 @@ model LessonProgress {
 model Product {
   id          String   @id @default(uuid())
   title       String
+  author      String?
   description String
   price       Float
   format      ProductFormat

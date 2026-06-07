@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
@@ -44,6 +44,152 @@ const AdminDashboard: React.FC = () => {
     const [showForgeModal, setShowForgeModal] = useState(false);
     const [showXperienceModal, setShowXperienceModal] = useState(false);
     const [showMindsetModal, setShowMindsetModal] = useState(false);
+
+    const [books, setBooks] = useState<any[]>([]);
+    const [loadingBooks, setLoadingBooks] = useState(true);
+    const [selectedBook, setSelectedBook] = useState<any | null>(null);
+    const [showEditBookModal, setShowEditBookModal] = useState(false);
+    const [showDeleteBookModal, setShowDeleteBookModal] = useState(false);
+    const [bookForm, setBookForm] = useState({
+        title: '',
+        author: '',
+        category: 'Desenvolvimento Pessoal',
+        coverImage: '',
+        description: '',
+        price: '12500',
+        format: 'PHYSICAL',
+        fileUrl: '',
+        stock: '10'
+    });
+
+    const fetchBooks = async () => {
+        setLoadingBooks(true);
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`);
+            if (res.ok) {
+                const data = await res.json();
+                setBooks(data);
+            }
+        } catch (err) {
+            console.error("Erro ao buscar livros:", err);
+        } finally {
+            setLoadingBooks(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchBooks();
+    }, []);
+
+    const handleEditClick = (book: any) => {
+        setSelectedBook(book);
+        setBookForm({
+            title: book.title || '',
+            author: book.author || '',
+            category: book.category || 'Desenvolvimento Pessoal',
+            coverImage: book.coverImage || '',
+            description: book.description || '',
+            price: book.price ? book.price.toString() : '0',
+            format: book.format || 'PHYSICAL',
+            fileUrl: book.fileUrl || '',
+            stock: book.stock ? book.stock.toString() : '0'
+        });
+        setShowEditBookModal(true);
+    };
+
+    const handleDeleteClick = (book: any) => {
+        setSelectedBook(book);
+        setShowDeleteBookModal(true);
+    };
+
+    const handleCreateBook = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: bookForm.title,
+                    author: bookForm.author,
+                    category: bookForm.category,
+                    coverImage: bookForm.coverImage,
+                    description: bookForm.description,
+                    price: parseFloat(bookForm.price) || 0,
+                    format: bookForm.format,
+                    fileUrl: bookForm.fileUrl || null,
+                    stock: bookForm.format === 'PHYSICAL' ? parseInt(bookForm.stock) || 0 : null
+                })
+            });
+            if (res.ok) {
+                setShowBookModal(false);
+                setBookForm({
+                    title: '',
+                    author: '',
+                    category: 'Desenvolvimento Pessoal',
+                    coverImage: '',
+                    description: '',
+                    price: '12500',
+                    format: 'PHYSICAL',
+                    fileUrl: '',
+                    stock: '10'
+                });
+                fetchBooks();
+            } else {
+                alert("Erro ao criar livro.");
+            }
+        } catch (err) {
+            console.error("Erro:", err);
+        }
+    };
+
+    const handleUpdateBook = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedBook) return;
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products/${selectedBook.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: bookForm.title,
+                    author: bookForm.author,
+                    category: bookForm.category,
+                    coverImage: bookForm.coverImage,
+                    description: bookForm.description,
+                    price: parseFloat(bookForm.price) || 0,
+                    format: bookForm.format,
+                    fileUrl: bookForm.fileUrl || null,
+                    stock: bookForm.format === 'PHYSICAL' ? parseInt(bookForm.stock) || 0 : null
+                })
+            });
+            if (res.ok) {
+                setShowEditBookModal(false);
+                setSelectedBook(null);
+                fetchBooks();
+            } else {
+                alert("Erro ao atualizar livro.");
+            }
+        } catch (err) {
+            console.error("Erro:", err);
+        }
+    };
+
+    const handleDeleteBook = async () => {
+        if (!selectedBook) return;
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products/${selectedBook.id}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                setShowDeleteBookModal(false);
+                setSelectedBook(null);
+                fetchBooks();
+            } else {
+                alert("Erro ao excluir livro.");
+            }
+        } catch (err) {
+            console.error("Erro:", err);
+        }
+    };
 
     const isSidebarCollapsed = false;
 
@@ -327,7 +473,20 @@ const AdminDashboard: React.FC = () => {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', gap: '15px' }}>
                                 <button
-                                    onClick={() => setShowBookModal(true)}
+                                    onClick={() => {
+                                        setBookForm({
+                                            title: '',
+                                            author: '',
+                                            category: 'Desenvolvimento Pessoal',
+                                            coverImage: '',
+                                            description: '',
+                                            price: '12500',
+                                            format: 'PHYSICAL',
+                                            fileUrl: '',
+                                            stock: '10'
+                                        });
+                                        setShowBookModal(true);
+                                    }}
                                     style={{ backgroundColor: '#0011fd', color: '#fff', border: 'none', padding: '12px 25px', borderRadius: '12px', fontWeight: 900, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
                                 >
                                     <Plus size={18} /> ADICIONAR LIVRO
@@ -335,24 +494,57 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '25px' }}>
-                            {[1, 2, 3].map(i => (
-                                <motion.div
-                                    key={i}
-                                    whileHover={{ y: -10 }}
-                                    style={{ backgroundColor: '#fff', borderRadius: '25px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
-                                >
-                                    <div style={{ aspectRatio: '3/4', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Book size={40} color="#cbd5e1" />
-                                    </div>
-                                    <div style={{ padding: '20px' }}>
-                                        <div style={{ fontSize: '10px', fontWeight: 900, color: '#0011fd', textTransform: 'uppercase', marginBottom: '5px' }}>Desenvolvimento</div>
-                                        <div style={{ fontWeight: 800, fontSize: '15px', color: '#0f172a', marginBottom: '5px' }}>A Única Coisa</div>
-                                        <div style={{ fontSize: '12px', color: '#64748b' }}>Gary Keller</div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
+                        {loadingBooks ? (
+                            <div style={{ textAlign: 'center', padding: '50px', color: '#64748b' }}>Carregando acervo de livros...</div>
+                        ) : books.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '50px', color: '#64748b' }}>Nenhum livro cadastrado.</div>
+                        ) : (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '25px' }}>
+                                {books.map(book => (
+                                    <motion.div
+                                        key={book.id}
+                                        whileHover={{ y: -10 }}
+                                        style={{ backgroundColor: '#fff', borderRadius: '25px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' }}
+                                    >
+                                        <div style={{ aspectRatio: '3/4', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
+                                            {book.coverImage ? (
+                                                <img src={book.coverImage} alt={book.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <Book size={40} color="#cbd5e1" />
+                                            )}
+                                            <span style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: book.format === 'PHYSICAL' ? '#1e293b' : '#0011fd', color: '#fff', fontSize: '9px', fontWeight: 900, padding: '4px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>
+                                                {book.format === 'PHYSICAL' ? 'Físico' : 'Ebook'}
+                                            </span>
+                                        </div>
+                                        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                                            <div style={{ fontSize: '10px', fontWeight: 900, color: '#0011fd', textTransform: 'uppercase', marginBottom: '5px' }}>{book.category}</div>
+                                            <div style={{ fontWeight: 800, fontSize: '15px', color: '#0f172a', marginBottom: '5px', lineBreak: 'anywhere' }}>{book.title}</div>
+                                            <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '15px' }}>{book.author || 'Sem Autor'}</div>
+                                            
+                                            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                                                <span style={{ fontSize: '12px', fontWeight: 900, color: '#0f172a' }}>{book.price.toLocaleString()} KZ</span>
+                                                <div style={{ display: 'flex', gap: '5px' }}>
+                                                    <button 
+                                                        onClick={() => handleEditClick(book)}
+                                                        style={{ border: 'none', background: '#f1f5f9', width: '30px', height: '30px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0011fd' }}
+                                                        title="Editar"
+                                                    >
+                                                        <Settings size={14} />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDeleteClick(book)}
+                                                        style={{ border: 'none', background: '#fee2e2', width: '30px', height: '30px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}
+                                                        title="Excluir"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -639,43 +831,184 @@ const AdminDashboard: React.FC = () => {
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '700px', borderRadius: '40px', border: '1px solid #e2e8f0', overflow: 'hidden' }}
                         >
+                            <form onSubmit={handleCreateBook}>
+                                <div style={{ padding: '40px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>NOVO LIVRO</h2>
+                                    <button type="button" onClick={() => setShowBookModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={24} /></button>
+                                </div>
+                                <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '70vh', overflowY: 'auto' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>TÍTULO DO LIVRO</label>
+                                            <input required type="text" placeholder="Título completo..." value={bookForm.title} onChange={e => setBookForm({...bookForm, title: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>AUTOR</label>
+                                            <input required type="text" placeholder="Nome do autor..." value={bookForm.author} onChange={e => setBookForm({...bookForm, author: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>CATEGORIA</label>
+                                            <select value={bookForm.category} onChange={e => setBookForm({...bookForm, category: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }}>
+                                                <option value="Desenvolvimento Pessoal">Desenvolvimento Pessoal</option>
+                                                <option value="Finanças">Finanças</option>
+                                                <option value="Marketing">Marketing</option>
+                                                <option value="Empreendedorismo">Empreendedorismo</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>CAPA (URL)</label>
+                                            <input type="text" placeholder="https://..." value={bookForm.coverImage} onChange={e => setBookForm({...bookForm, coverImage: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>PREÇO (AKZ)</label>
+                                            <input required type="number" placeholder="Preço do livro..." value={bookForm.price} onChange={e => setBookForm({...bookForm, price: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>FORMATO</label>
+                                            <select value={bookForm.format} onChange={e => setBookForm({...bookForm, format: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }}>
+                                                <option value="PHYSICAL">Físico</option>
+                                                <option value="DIGITAL">Digital (Ebook)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {bookForm.format === 'DIGITAL' ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>ARQUIVO DO EBOOK (URL)</label>
+                                            <input type="text" placeholder="https://..." value={bookForm.fileUrl} onChange={e => setBookForm({...bookForm, fileUrl: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>ESTOQUE</label>
+                                            <input type="number" placeholder="Quantidade em estoque..." value={bookForm.stock} onChange={e => setBookForm({...bookForm, stock: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>SINOPSE</label>
+                                        <textarea placeholder="Resumo do livro..." value={bookForm.description} onChange={e => setBookForm({...bookForm, description: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a', height: '100px', resize: 'none' }}></textarea>
+                                    </div>
+                                    <button type="submit" style={{ backgroundColor: '#0011fd', color: '#fff', border: 'none', padding: '18px', borderRadius: '15px', fontWeight: 900, fontSize: '16px', cursor: 'pointer' }}>
+                                        SALVAR NO ACERVO
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+
+                {/* Edit Book Modal */}
+                {showEditBookModal && (
+                    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '700px', borderRadius: '40px', border: '1px solid #e2e8f0', overflow: 'hidden' }}
+                        >
+                            <form onSubmit={handleUpdateBook}>
+                                <div style={{ padding: '40px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>EDITAR LIVRO</h2>
+                                    <button type="button" onClick={() => setShowEditBookModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={24} /></button>
+                                </div>
+                                <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '70vh', overflowY: 'auto' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>TÍTULO DO LIVRO</label>
+                                            <input required type="text" placeholder="Título completo..." value={bookForm.title} onChange={e => setBookForm({...bookForm, title: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>AUTOR</label>
+                                            <input required type="text" placeholder="Nome do autor..." value={bookForm.author} onChange={e => setBookForm({...bookForm, author: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>CATEGORIA</label>
+                                            <select value={bookForm.category} onChange={e => setBookForm({...bookForm, category: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }}>
+                                                <option value="Desenvolvimento Pessoal">Desenvolvimento Pessoal</option>
+                                                <option value="Finanças">Finanças</option>
+                                                <option value="Marketing">Marketing</option>
+                                                <option value="Empreendedorismo">Empreendedorismo</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>CAPA (URL)</label>
+                                            <input type="text" placeholder="https://..." value={bookForm.coverImage} onChange={e => setBookForm({...bookForm, coverImage: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>PREÇO (AKZ)</label>
+                                            <input required type="number" placeholder="Preço do livro..." value={bookForm.price} onChange={e => setBookForm({...bookForm, price: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>FORMATO</label>
+                                            <select value={bookForm.format} onChange={e => setBookForm({...bookForm, format: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }}>
+                                                <option value="PHYSICAL">Físico</option>
+                                                <option value="DIGITAL">Digital (Ebook)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {bookForm.format === 'DIGITAL' ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>ARQUIVO DO EBOOK (URL)</label>
+                                            <input type="text" placeholder="https://..." value={bookForm.fileUrl} onChange={e => setBookForm({...bookForm, fileUrl: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>ESTOQUE</label>
+                                            <input type="number" placeholder="Quantidade em estoque..." value={bookForm.stock} onChange={e => setBookForm({...bookForm, stock: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>SINOPSE</label>
+                                        <textarea placeholder="Resumo do livro..." value={bookForm.description} onChange={e => setBookForm({...bookForm, description: e.target.value})} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a', height: '100px', resize: 'none' }}></textarea>
+                                    </div>
+                                    <button type="submit" style={{ backgroundColor: '#0011fd', color: '#fff', border: 'none', padding: '18px', borderRadius: '15px', fontWeight: 900, fontSize: '16px', cursor: 'pointer' }}>
+                                        SALVAR ALTERAÇÕES
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+
+                {/* Delete Book Modal */}
+                {showDeleteBookModal && selectedBook && (
+                    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '500px', borderRadius: '35px', border: '1px solid #e2e8f0', overflow: 'hidden' }}
+                        >
                             <div style={{ padding: '40px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>NOVO LIVRO</h2>
-                                <button onClick={() => setShowBookModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={24} /></button>
+                                <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#ef4444' }}>EXCLUIR LIVRO</h2>
+                                <button type="button" onClick={() => { setShowDeleteBookModal(false); setSelectedBook(null); }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={24} /></button>
                             </div>
                             <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>TÍTULO DO LIVRO</label>
-                                        <input type="text" placeholder="Título completo..." style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>AUTOR</label>
-                                        <input type="text" placeholder="Nome do autor..." style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
-                                    </div>
+                                <p style={{ color: '#64748b', fontSize: '15px', lineHeight: 1.5 }}>
+                                    Tem certeza que deseja excluir permanentemente o livro <strong>{selectedBook.title}</strong>? Esta ação não pode ser desfeita.
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
+                                    <button 
+                                        type="button"
+                                        onClick={() => { setShowDeleteBookModal(false); setSelectedBook(null); }}
+                                        style={{ backgroundColor: '#f1f5f9', color: '#0f172a', border: 'none', padding: '15px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={handleDeleteBook}
+                                        style={{ backgroundColor: '#ef4444', color: '#fff', border: 'none', padding: '15px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                                    >
+                                        Sim, Excluir
+                                    </button>
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>CATEGORIA</label>
-                                        <select style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }}>
-                                            <option>Desenvolvimento Pessoal</option>
-                                            <option>Finanças</option>
-                                            <option>Marketing</option>
-                                            <option>Empreendedorismo</option>
-                                        </select>
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>CAPA (URL)</label>
-                                        <input type="text" placeholder="https://..." style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a' }} />
-                                    </div>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <label style={{ fontSize: '12px', fontWeight: 900, color: '#64748b' }}>SINOPSE</label>
-                                    <textarea placeholder="Resumo do livro..." style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '15px', borderRadius: '15px', color: '#0f172a', height: '100px', resize: 'none' }}></textarea>
-                                </div>
-                                <button style={{ backgroundColor: '#0011fd', color: '#fff', border: 'none', padding: '18px', borderRadius: '15px', fontWeight: 900, fontSize: '16px', cursor: 'pointer' }}>
-                                    SALVAR NO ACERVO
-                                </button>
                             </div>
                         </motion.div>
                     </div>

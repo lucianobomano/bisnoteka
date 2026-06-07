@@ -16,7 +16,7 @@ const Header: React.FC = () => {
           className="flex items-center cursor-pointer flex-shrink-0"
           style={{ textDecoration: 'none' }}
         >
-          <span className="text-3xl font-normal tracking-tighter text-white">BISNOTEKA</span>
+          <img src="/LOGO H.svg" alt="Bisnoteka Logo" style={{ height: '28px', width: 'auto' }} />
         </Link>
 
         {/* Right Side: Navigation, CTAs and Avatar */}
@@ -195,10 +195,10 @@ const Header: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexShrink: 0 }}>
           <Link
             to="/"
-            style={{ fontSize: '24px', fontWeight: 400, letterSpacing: '-1px', color: 'white', cursor: 'pointer', textDecoration: 'none' }}
+            style={{ display: 'flex', alignItems: 'center', height: '24px', textDecoration: 'none' }}
             onClick={() => setIsMenuOpen(false)}
           >
-            BISNOTEKA
+            <img src="/LOGO H.svg" alt="Bisnoteka Logo" style={{ height: '100%', width: 'auto' }} />
           </Link>
           <button
             style={{

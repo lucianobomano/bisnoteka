@@ -228,6 +228,66 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
+app.post('/api/products', async (req, res) => {
+    try {
+        const data = req.body;
+        const newProduct = await prisma.product.create({
+            data: {
+                title: data.title,
+                author: data.author || null,
+                description: data.description || '',
+                price: data.price ? parseFloat(data.price) : 0,
+                format: data.format === 'DIGITAL' ? 'DIGITAL' : 'PHYSICAL',
+                coverImage: data.coverImage || null,
+                fileUrl: data.fileUrl || null,
+                stock: data.stock ? parseInt(data.stock) : null,
+                category: data.category || 'Geral'
+            }
+        });
+        res.status(201).json(newProduct);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to create product." });
+    }
+});
+
+app.put('/api/products/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = req.body;
+        const updatedProduct = await prisma.product.update({
+            where: { id },
+            data: {
+                title: data.title !== undefined ? data.title : undefined,
+                author: data.author !== undefined ? data.author : undefined,
+                description: data.description !== undefined ? data.description : undefined,
+                price: data.price !== undefined ? parseFloat(data.price) : undefined,
+                format: data.format !== undefined ? (data.format === 'DIGITAL' ? 'DIGITAL' : 'PHYSICAL') : undefined,
+                coverImage: data.coverImage !== undefined ? data.coverImage : undefined,
+                fileUrl: data.fileUrl !== undefined ? data.fileUrl : undefined,
+                stock: data.stock !== undefined ? (data.stock ? parseInt(data.stock) : null) : undefined,
+                category: data.category !== undefined ? data.category : undefined
+            }
+        });
+        res.json(updatedProduct);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to update product." });
+    }
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.product.delete({ where: { id } });
+        res.json({ message: "Product deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to delete product." });
+    }
+});
+
+
 app.get('/api/success-stories', async (req, res) => {
     try {
         const stories = await prisma.successStory.findMany({ orderBy: { publishedAt: 'desc' } });
