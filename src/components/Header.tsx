@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Menu, X, ChevronDown, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Header: React.FC = () => {
+  const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -140,10 +142,17 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Avatar */}
-          <Link to="/membros" style={{ width: '42px', height: '42px', backgroundColor: 'rgba(255,255,255,0.1)' }} title="Área de Membros" className="rounded-full hover:bg-[#f83821] hover:text-white flex items-center justify-center text-white/90 border border-white/10 transition-all flex-shrink-0 shadow-lg group">
-            <User size={24} className="group-hover:scale-110 transition-transform" />
-          </Link>
+          {/* Avatar / User Name */}
+          <div className="flex items-center gap-3">
+            {user && (
+              <span className="text-sm font-medium text-white/80 hidden xl:inline">
+                Olá, {user.name.split(' ')[0]}
+              </span>
+            )}
+            <Link to="/membros" style={{ width: '42px', height: '42px', backgroundColor: 'rgba(255,255,255,0.1)' }} title={user ? "Área de Membros" : "Entrar / Criar Conta"} className="rounded-full hover:bg-[#f83821] hover:text-white flex items-center justify-center text-white/90 border border-white/10 transition-all flex-shrink-0 shadow-lg group">
+              <User size={24} className="group-hover:scale-110 transition-transform" />
+            </Link>
+          </div>
         </div>
 
         {/* Mobile menu button */}

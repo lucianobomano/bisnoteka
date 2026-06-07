@@ -4,7 +4,10 @@ import { BookOpen, User, Settings, LogOut, Menu, X, PlayCircle } from 'lucide-re
 import { motion, AnimatePresence } from 'framer-motion';
 import '../members.css'; // Import the dedicated CSS
 
+import { useAuth } from '../context/AuthContext';
+
 const MembersLayout: React.FC = () => {
+    const { logout } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
 
@@ -42,7 +45,7 @@ const MembersLayout: React.FC = () => {
                         style={{
                             position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 90
                         }}
-                        className="lg:hidden" /* Keeping standard index.css helper if any, or just inline */
+                        className="lg:hidden"
                     />
                 )}
             </AnimatePresence>
@@ -89,12 +92,18 @@ const MembersLayout: React.FC = () => {
 
                 </div>
 
-                <Link to="/" style={{ textDecoration: 'none', marginTop: '1rem' }}>
+                <button 
+                    onClick={() => {
+                        logout();
+                        setSidebarOpen(false);
+                    }} 
+                    style={{ background: 'transparent', border: 'none', padding: 0, textAlign: 'left', width: '100%', cursor: 'pointer' }}
+                >
                     <div className="sidebar-nav-item" style={{ color: '#f83821', fontWeight: 'bold' }}>
                         <LogOut size={20} />
                         Sair
                     </div>
-                </Link>
+                </button>
             </div>
 
             {/* Main Content Area */}

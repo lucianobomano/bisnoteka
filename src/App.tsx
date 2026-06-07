@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -25,6 +25,12 @@ import BusinessOnboardingPage from './pages/BusinessOnboardingPage';
 import MagazineReaderPage from './pages/MagazineReaderPage';
 import BusinessDetailsPage from './pages/BusinessDetailsPage';
 
+// Auth Imports
+import { AuthProvider, useAuth } from './context/AuthContext';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import OnboardingPage from './pages/OnboardingPage';
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -33,18 +39,88 @@ const ScrollToTop = () => {
   return null;
 };
 
+// Route Guard for Protected Pages (e.g. Members Area, Business Creator)
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#080d14] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-t-red-600 border-r-transparent border-b-red-600 border-l-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!user.onboardingCompleted) {
+    return <Navigate to="/onboarding" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Route Guard for Auth Pages (Login/Register) - Redirects away if already logged in
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#080d14] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-t-red-600 border-r-transparent border-b-red-600 border-l-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
+  if (user) {
+    if (!user.onboardingCompleted) {
+      return <Navigate to="/onboarding" replace />;
+    }
+    return <Navigate to="/membros" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Route Guard for Onboarding Wizard - Requires active login but must not be completed yet
+const OnboardingRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#080d14] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-t-red-600 border-r-transparent border-b-red-600 border-l-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (user.onboardingCompleted) {
+    return <Navigate to="/membros" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 const AppContent: React.FC = () => {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
   const isMembersPage = location.pathname.startsWith('/membros');
   const isReaderPage = location.pathname.startsWith('/ler-revista');
-  const hideHeaderFooter = isAdminPage || isMembersPage || isReaderPage;
-
+  const isAuthPage = ['/login', '/cadastro', '/onboarding'].includes(location.pathname);
+  const hideHeaderFooter = isAdminPage || isMembersPage || isReaderPage || isAuthPage;
+ 
   return (
     <div className="min-h-screen bg-white">
       {!hideHeaderFooter && <Header />}
       <main>
         <Routes>
+          {/* Public Landing Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/livros" element={<Books />} />
           <Route path="/sucesso" element={<SuccessStoriesPage />} />
@@ -58,12 +134,25 @@ const AppContent: React.FC = () => {
           <Route path="/forge" element={<FaundrForgePage />} />
           <Route path="/experience" element={<FaundrExperiencePage />} />
           <Route path="/disruptivo" element={<MindsetDisruptivoPage />} />
-          <Route path="/bisnoteka" element={<BisnotekaPage />} />
-          <Route path="/bisnoteka/:id" element={<IdeaDetailsPage />} />
-          <Route path="/criar-negocio" element={<BusinessOnboardingPage />} />
+          
+          {/* Authentication & User Onboarding */}
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/cadastro" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Route path="/onboarding" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
+
+          {/* Protected Business Generator Tool */}
+          <Route path="/criar-negocio" element={<ProtectedRoute><BusinessOnboardingPage /></ProtectedRoute>} />
+          <Route path="/bisnoteka" element={<ProtectedRoute><BisnotekaPage /></ProtectedRoute>} />
+          <Route path="/bisnoteka/:id" element={<ProtectedRoute><IdeaDetailsPage /></ProtectedRoute>} />
+          
+          {/* Admin area (could also be protected by a role guard) */}
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/checkout/:id" element={<CheckoutPage />} />
-          <Route path="/membros" element={<MembersLayout />}>
+          
+          {/* Protected Checkout */}
+          <Route path="/checkout/:id" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+          
+          {/* Members Area */}
+          <Route path="/membros" element={<ProtectedRoute><MembersLayout /></ProtectedRoute>}>
             <Route index element={<MembersDashboardPage />} />
             <Route path="curso/:id" element={<MembersCoursePlayerPage />} />
             <Route path="negocio/:id" element={<BusinessDetailsPage />} />
@@ -78,8 +167,10 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      <ScrollToTop />
-      <AppContent />
+      <AuthProvider>
+        <ScrollToTop />
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }

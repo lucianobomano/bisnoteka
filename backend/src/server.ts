@@ -8,6 +8,8 @@ import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -37,7 +39,7 @@ app.use(helmet());
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '100mb' }));
 
@@ -475,6 +477,206 @@ app.get('/api/mindset', async (req, res) => {
         res.json(tracks);
     } catch (error) {
         console.error(error); res.status(500).json({ error: "Failed to fetch mindset tracks." });
+    }
+});
+
+// ====================================================
+// AUTHENTICATION & ONBOARDING API
+// ====================================================
+
+const JWT_SECRET = process.env.JWT_SECRET || 'bisnoteka-super-secret-key-2026';
+
+interface AuthRequest extends express.Request {
+    user?: {
+        id: string;
+        email: string;
+        role: string;
+    };
+}
+
+const authenticateToken = (req: AuthRequest, res: express.Response, next: express.NextFunction): void => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        res.status(401).json({ error: "Access token required" });
+        return;
+    }
+
+    jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
+        if (err) {
+            res.status(403).json({ error: "Invalid or expired token" });
+            return;
+        }
+        req.user = decoded;
+        next();
+    });
+};
+
+// 1. Register
+app.post('/api/auth/register', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            res.status(400).json({ error: "Name, email and password are required" });
+            return;
+        }
+
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            res.status(400).json({ error: "Email is already registered" });
+            return;
+        }
+
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                passwordHash,
+                role: 'USER',
+                subscriptionTier: 'FREE'
+            }
+        });
+
+        const token = jwt.sign(
+            { id: newUser.id, email: newUser.email, role: newUser.role },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.status(201).json({
+            token,
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                role: newUser.role,
+                subscriptionTier: newUser.subscriptionTier,
+                onboardingCompleted: newUser.onboardingCompleted,
+                onboardingData: newUser.onboardingData
+            }
+        });
+    } catch (error) {
+        console.error("Register error:", error);
+        res.status(500).json({ error: "Failed to register user" });
+    }
+});
+
+// 2. Login
+app.post('/api/auth/login', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            res.status(400).json({ error: "Email and password are required" });
+            return;
+        }
+
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user || !user.passwordHash) {
+            res.status(401).json({ error: "Invalid email or password" });
+            return;
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+        if (!isPasswordValid) {
+            res.status(401).json({ error: "Invalid email or password" });
+            return;
+        }
+
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                subscriptionTier: user.subscriptionTier,
+                onboardingCompleted: user.onboardingCompleted,
+                onboardingData: user.onboardingData
+            }
+        });
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({ error: "Failed to login" });
+    }
+});
+
+// 3. Me (Get current profile)
+app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res: express.Response): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+            return;
+        }
+
+        res.json({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            subscriptionTier: user.subscriptionTier,
+            onboardingCompleted: user.onboardingCompleted,
+            onboardingData: user.onboardingData
+        });
+    } catch (error) {
+        console.error("Auth me error:", error);
+        res.status(500).json({ error: "Failed to fetch user profile" });
+    }
+});
+
+// 4. Submit Onboarding Answers
+app.post('/api/auth/onboarding', authenticateToken, async (req: AuthRequest, res: express.Response): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const { answers } = req.body;
+        if (!answers) {
+            res.status(400).json({ error: "Onboarding answers are required" });
+            return;
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: req.user.id },
+            data: {
+                onboardingCompleted: true,
+                onboardingData: JSON.stringify(answers)
+            }
+        });
+
+        res.json({
+            success: true,
+            user: {
+                id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                subscriptionTier: updatedUser.subscriptionTier,
+                onboardingCompleted: updatedUser.onboardingCompleted,
+                onboardingData: updatedUser.onboardingData
+            }
+        });
+    } catch (error) {
+        console.error("Onboarding submission error:", error);
+        res.status(500).json({ error: "Failed to submit onboarding answers" });
     }
 });
 
