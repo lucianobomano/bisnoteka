@@ -50,13 +50,13 @@ const FaundrForgePage: React.FC = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row items-center gap-5">
-                <Link to="/cadastro" className="group relative w-full sm:w-auto overflow-hidden rounded-full p-[1px] transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(248,56,33,0.5)]">
-                  <span className="absolute inset-0 bg-gradient-to-r from-[#f83821] to-[#b91c1c] rounded-full"></span>
-                  <div className="relative flex items-center justify-center gap-3 px-10 py-5 bg-[#f83821] rounded-full text-white font-bold text-lg uppercase tracking-wide transition-all group-hover:bg-transparent">
+                <Link to="/cadastro" className="group relative w-full sm:w-auto overflow-hidden rounded-full p-[1px] transition-all hover:scale-105" style={{ boxShadow: '0 0 40px -10px rgba(248,56,33,0.5)' }}>
+                  <span className="absolute inset-0 rounded-full" style={{ backgroundImage: 'linear-gradient(to right, #f83821, #b91c1c)' }}></span>
+                  <div className="relative flex items-center justify-center gap-3 px-10 py-5 rounded-full font-bold text-lg uppercase tracking-wide transition-all group-hover:bg-transparent" style={{ backgroundColor: '#f83821', color: 'white' }}>
                     Garantir Lugar na Turma <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
-                <a href="#programa" className="group flex items-center gap-2 px-8 py-5 text-[#050505] font-bold text-lg hover:text-[#f83821] transition-colors">
+                <a href="#programa" className="group flex items-center gap-2 px-8 py-5 font-bold text-lg hover:text-[#f83821] transition-colors" style={{ color: '#050505' }}>
                   Ver o currículo completo <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </a>
               </div>
@@ -263,10 +263,10 @@ const FaundrForgePage: React.FC = () => {
           <p className="text-xl md:text-2xl mb-14 text-white/90 font-light max-w-2xl mx-auto">
             As vagas para a próxima turma limitam-se a garantir a qualidade de execução de cada membro. Tome a decisão hoje.
           </p>
-          <Link to="/cadastro" className="group inline-flex items-center justify-center gap-4 px-12 py-6 rounded-full transition-all shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7)] hover:-translate-y-1" style={{ backgroundColor: '#050505', color: 'white' }}>
-            <span className="font-black text-xl uppercase tracking-widest">Submeter Aplicação</span>
-            <span className="bg-white/10 p-2 rounded-full group-hover:bg-white group-hover:text-[#050505] transition-colors">
-              <ArrowRight size={24} />
+          <Link to="/cadastro" className="group inline-flex items-center justify-center gap-4 px-12 py-6 rounded-full transition-all hover:-translate-y-1" style={{ backgroundColor: '#050505', color: 'white', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.5)', textDecoration: 'none' }}>
+            <span className="font-black text-xl uppercase tracking-widest text-white">Submeter Aplicação</span>
+            <span className="p-2 rounded-full transition-colors" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
+              <ArrowRight size={24} color="white" />
             </span>
           </Link>
           <p className="mt-8 text-sm text-white/70 font-medium uppercase tracking-widest">Ciclo Restrito • Lugares Limitados</p>
