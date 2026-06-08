@@ -9,8 +9,8 @@ const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 text-white shadow-xl font-['Roboto'] select-none" style={{ height: '75px', backgroundColor: '#10171f' }}>
-      <div className="h-full flex items-center justify-between w-full px-4 lg:px-[100px]">
+    <header className="sticky top-0 z-50 text-white shadow-xl font-['Roboto'] select-none" style={{ height: '75px', backgroundColor: '#10171f', paddingLeft: '100px', paddingRight: '100px' }}>
+      <div className="h-full flex items-center justify-between w-full">
 
         {/* Left Side: Logo only */}
         <Link
