@@ -135,13 +135,13 @@ const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#8892b0', uppercase: 'true', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>E-mail</label>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#8892b0', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>E-mail</label>
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
-                  insetY: 0,
+                  top: 0,
+                  bottom: 0,
                   left: '14px',
-                  top: '15px',
                   display: 'flex',
                   alignItems: 'center',
                   color: emailFocused ? '#f83821' : '#4b5563',
@@ -181,9 +181,9 @@ const LoginPage: React.FC = () => {
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
-                  insetY: 0,
+                  top: 0,
+                  bottom: 0,
                   left: '14px',
-                  top: '15px',
                   display: 'flex',
                   alignItems: 'center',
                   color: passwordFocused ? '#f83821' : '#4b5563',

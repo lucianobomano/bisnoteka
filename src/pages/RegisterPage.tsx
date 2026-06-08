@@ -156,9 +156,9 @@ const RegisterPage: React.FC = () => {
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
-                  insetY: 0,
+                  top: 0,
+                  bottom: 0,
                   left: '14px',
-                  top: '15px',
                   display: 'flex',
                   alignItems: 'center',
                   color: nameFocused ? '#f83821' : '#4b5563',
@@ -195,9 +195,9 @@ const RegisterPage: React.FC = () => {
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
-                  insetY: 0,
+                  top: 0,
+                  bottom: 0,
                   left: '14px',
-                  top: '15px',
                   display: 'flex',
                   alignItems: 'center',
                   color: emailFocused ? '#f83821' : '#4b5563',
@@ -234,9 +234,9 @@ const RegisterPage: React.FC = () => {
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
-                  insetY: 0,
+                  top: 0,
+                  bottom: 0,
                   left: '14px',
-                  top: '15px',
                   display: 'flex',
                   alignItems: 'center',
                   color: passwordFocused ? '#f83821' : '#4b5563',
@@ -290,9 +290,9 @@ const RegisterPage: React.FC = () => {
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
-                  insetY: 0,
+                  top: 0,
+                  bottom: 0,
                   left: '14px',
-                  top: '15px',
                   display: 'flex',
                   alignItems: 'center',
                   color: confirmPasswordFocused ? '#f83821' : '#4b5563',
