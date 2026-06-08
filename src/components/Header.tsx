@@ -10,7 +10,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 text-white shadow-xl font-['Roboto'] select-none" style={{ height: '75px', backgroundColor: '#10171f' }}>
-      <div className="h-full flex items-center justify-between w-full px-4 lg:px-20">
+      <div className="h-full flex items-center justify-between w-full px-4 lg:px-[100px]">
 
         {/* Left Side: Logo only */}
         <Link
@@ -137,22 +137,34 @@ const Header: React.FC = () => {
             <Link to="/cursos" style={{ width: '108px', height: '42px', backgroundColor: '#f93821', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all flex-shrink-0 tracking-tight">
               Cursos
             </Link>
-            <Link to="/disruptivo" style={{ width: '186px', height: '42px', border: '2px solid #f83821', backgroundColor: 'transparent', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:bg-[#f83821]/10 transition-all flex-shrink-0 tracking-tight">
-              Mindset Disruptivo
-            </Link>
+            
+            {user ? (
+              <Link to="/disruptivo" style={{ width: '186px', height: '42px', border: '2px solid #f83821', backgroundColor: 'transparent', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:bg-[#f83821]/10 transition-all flex-shrink-0 tracking-tight">
+                Mindset Disruptivo
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" style={{ width: '100px', height: '42px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:bg-white/5 transition-all flex-shrink-0 tracking-tight">
+                  Login
+                </Link>
+                <Link to="/cadastro" style={{ width: '120px', height: '42px', backgroundColor: '#f83821', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all flex-shrink-0 tracking-tight">
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Avatar / User Name */}
-          <div className="flex items-center gap-3">
-            {user && (
+          {user && (
+            <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-white/80 hidden xl:inline">
                 Olá, {user.name.split(' ')[0]}
               </span>
-            )}
-            <Link to="/membros" style={{ width: '42px', height: '42px', backgroundColor: 'rgba(255,255,255,0.1)' }} title={user ? "Área de Membros" : "Entrar / Criar Conta"} className="rounded-full hover:bg-[#f83821] hover:text-white flex items-center justify-center text-white/90 border border-white/10 transition-all flex-shrink-0 shadow-lg group">
-              <User size={24} className="group-hover:scale-110 transition-transform" />
-            </Link>
-          </div>
+              <Link to="/membros" style={{ width: '42px', height: '42px', backgroundColor: 'rgba(255,255,255,0.1)' }} title="Área de Membros" className="rounded-full hover:bg-[#f83821] hover:text-white flex items-center justify-center text-white/90 border border-white/10 transition-all flex-shrink-0 shadow-lg group">
+                <User size={24} className="group-hover:scale-110 transition-transform" />
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -235,7 +247,7 @@ const Header: React.FC = () => {
             { name: 'Revista', path: '/faundr-magazine' },
             { name: 'Podcasts', path: '/podcasts' },
             { name: 'Bisnoteka', path: '/bisnoteka' },
-            { name: 'Área de Membros', path: '/membros' }
+            ...(user ? [{ name: 'Área de Membros', path: '/membros' }] : [])
           ].map((link) => (
             <Link
               key={link.name}
@@ -267,9 +279,20 @@ const Header: React.FC = () => {
           <Link to="/cursos" onClick={() => setIsMenuOpen(false)} style={{ width: '100%', height: '52px', backgroundColor: '#f93821', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 400, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
             Cursos
           </Link>
-          <Link to="/disruptivo" onClick={() => setIsMenuOpen(false)} style={{ width: '100%', height: '52px', backgroundColor: 'transparent', color: 'white', border: '2px solid #f83821', borderRadius: '10px', fontWeight: 400, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
-            Mindset Disruptivo
-          </Link>
+          {user ? (
+            <Link to="/disruptivo" onClick={() => setIsMenuOpen(false)} style={{ width: '100%', height: '52px', backgroundColor: 'transparent', color: 'white', border: '2px solid #f83821', borderRadius: '10px', fontWeight: 400, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+              Mindset Disruptivo
+            </Link>
+          ) : (
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Link to="/login" onClick={() => setIsMenuOpen(false)} style={{ flex: 1, height: '52px', backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', fontWeight: 400, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+                Login
+              </Link>
+              <Link to="/cadastro" onClick={() => setIsMenuOpen(false)} style={{ flex: 1, height: '52px', backgroundColor: '#f83821', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 400, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
