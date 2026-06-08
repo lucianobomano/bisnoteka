@@ -128,26 +128,27 @@ const Header: React.FC = () => {
 
           {/* CTAs */}
           <div className="flex items-center" style={{ gap: '12px' }}>
-            <Link to="/forge" style={{ width: '170px', height: '42px', backgroundColor: '#e5e0e7', color: '#000000', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="font-normal rounded-full hover:brightness-95 transition-all flex-shrink-0 tracking-tight">
+            <Link to="/forge" style={{ width: '170px', height: '40px', backgroundColor: '#e5e0e7', color: '#000000', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="font-normal rounded-full hover:brightness-95 transition-all flex-shrink-0 tracking-tight">
               Faundr Forge
             </Link>
-            <Link to="/experience" style={{ width: '170px', height: '42px', backgroundColor: '#0011fd', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all shadow-[0_8px_20px_rgba(0,17,253,0.25)] flex-shrink-0 tracking-tight">
+            <Link to="/experience" style={{ width: '170px', height: '40px', backgroundColor: '#0011fd', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all shadow-[0_8px_20px_rgba(0,17,253,0.25)] flex-shrink-0 tracking-tight">
               Faundr Xperience
             </Link>
-            <Link to="/cursos" style={{ width: '108px', height: '42px', backgroundColor: '#f93821', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all flex-shrink-0 tracking-tight">
+            <Link to="/cursos" style={{ width: '108px', height: '40px', backgroundColor: '#f93821', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all flex-shrink-0 tracking-tight">
               Cursos
             </Link>
             
             {user ? (
-              <Link to="/disruptivo" style={{ width: '186px', height: '42px', border: '2px solid #f83821', backgroundColor: 'transparent', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:bg-[#f83821]/10 transition-all flex-shrink-0 tracking-tight">
+              <Link to="/disruptivo" style={{ width: '186px', height: '40px', border: '2px solid #f83821', backgroundColor: 'transparent', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:bg-[#f83821]/10 transition-all flex-shrink-0 tracking-tight">
                 Mindset Disruptivo
               </Link>
             ) : (
               <>
-                <Link to="/login" style={{ width: '100px', height: '42px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:bg-white/5 transition-all flex-shrink-0 tracking-tight">
+                <div style={{ width: '1px', height: '30px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '0 4px' }}></div>
+                <Link to="/login" style={{ width: '100px', height: '40px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:bg-white/5 transition-all flex-shrink-0 tracking-tight">
                   Login
                 </Link>
-                <Link to="/cadastro" style={{ width: '120px', height: '42px', backgroundColor: '#f83821', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all flex-shrink-0 tracking-tight">
+                <Link to="/cadastro" style={{ width: '120px', height: '40px', backgroundColor: '#f83821', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} className="text-white font-normal rounded-full hover:brightness-110 transition-all flex-shrink-0 tracking-tight">
                   Sign Up
                 </Link>
               </>
@@ -160,7 +161,7 @@ const Header: React.FC = () => {
               <span className="text-sm font-medium text-white/80 hidden xl:inline">
                 Olá, {user.name.split(' ')[0]}
               </span>
-              <Link to="/membros" style={{ width: '42px', height: '42px', backgroundColor: 'rgba(255,255,255,0.1)' }} title="Área de Membros" className="rounded-full hover:bg-[#f83821] hover:text-white flex items-center justify-center text-white/90 border border-white/10 transition-all flex-shrink-0 shadow-lg group">
+              <Link to="/membros" style={{ width: '40px', height: '40px', backgroundColor: 'rgba(255,255,255,0.1)' }} title="Área de Membros" className="rounded-full hover:bg-[#f83821] hover:text-white flex items-center justify-center text-white/90 border border-white/10 transition-all flex-shrink-0 shadow-lg group">
                 <User size={24} className="group-hover:scale-110 transition-transform" />
               </Link>
             </div>
