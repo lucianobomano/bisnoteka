@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, ArrowRight, Check, Image as ImageIcon, Book, Target, LayoutTemplate, Briefcase, FileText, CheckCircle, Loader2, FolderOpen, PieChart, Network, CalendarDays, TrendingUp, Megaphone, Shield } from 'lucide-react';
 
 interface BusinessData {
@@ -35,6 +36,7 @@ const TypewriterText: React.FC<{ text: string, style?: React.CSSProperties }> = 
 
 const BusinessOnboardingPage: React.FC = () => {
     const navigate = useNavigate();
+    const { token } = useAuth();
     const [step, setStep] = useState(0);
     const [formData, setFormData] = useState<BusinessData>({
         name: '',
@@ -116,7 +118,10 @@ const BusinessOnboardingPage: React.FC = () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/business/generate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(formData)
             });
 

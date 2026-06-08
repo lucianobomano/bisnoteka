@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlayCircle, Clock, Trophy, Star, Play, Briefcase, Wand2, ChevronRight, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 
 interface RealBusiness {
@@ -21,13 +22,17 @@ const MembersDashboardPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isCoursesLoading, setIsCoursesLoading] = useState(true);
 
+    const { token, user } = useAuth();
+
     React.useEffect(() => {
-        if (activeTab === 'negocios') {
+        if (activeTab === 'negocios' && token) {
             setIsLoading(true);
-            fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/business`)
+            fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/user/business`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
                 .then(res => res.json())
                 .then(data => {
-                    setRealBusinesses(data);
+                    setRealBusinesses(Array.isArray(data) ? data : []);
                     setIsLoading(false);
                 })
                 .catch(err => {
@@ -35,32 +40,36 @@ const MembersDashboardPage: React.FC = () => {
                     setIsLoading(false);
                 });
         }
-    }, [activeTab]);
+    }, [activeTab, token]);
 
     React.useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/courses`)
-            .then(res => res.json())
-            .then(data => {
-                const formatted = data.slice(0, 2).map((c: any, index: number) => ({
-                    ...c,
-                    img: c.coverImage || "/media/COURSE_ECOMMERCE.png",
-                    progress: index === 0 ? 35 : 0
-                }));
-                setMyCourses(formatted);
-                setIsCoursesLoading(false);
+        if (token) {
+            fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/user/courses`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             })
-            .catch(err => {
-                console.error("Failed to fetch courses", err);
-                setIsCoursesLoading(false);
-            });
-    }, []);
+                .then(res => res.json())
+                .then(data => {
+                    const formatted = (Array.isArray(data) ? data : []).map((c: any) => ({
+                        ...c,
+                        img: c.coverImage || "/media/COURSE_ECOMMERCE.png",
+                        progress: c.progress || 0
+                    }));
+                    setMyCourses(formatted);
+                    setIsCoursesLoading(false);
+                })
+                .catch(err => {
+                    console.error("Failed to fetch courses", err);
+                    setIsCoursesLoading(false);
+                });
+        }
+    }, [token]);
 
     return (
         <div style={{ paddingBottom: '2rem' }}>
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
                 <div>
                     <h1 style={{ fontSize: '2.25rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '-0.025em', color: '#fff' }}>
-                        Bem-vindo de volta!
+                        Bem-vindo{user ? `, ${user.name.split(' ')[0]}` : ' de volta'}!
                     </h1>
                     <p style={{ color: '#aaaaaa', fontSize: '1.125rem' }}>O seu painel central de evolução e negócios.</p>
                 </div>

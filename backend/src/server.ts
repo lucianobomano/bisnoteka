@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
@@ -36,12 +37,79 @@ const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY || "YOUR_AP
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "YOUR_API_KEY" });
 
 app.use(helmet());
+
+const allowedOrigins = ['http://localhost:5173'];
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json({ limit: '100mb' }));
+
+// Proteção contra DoS de Payload (Reduzido de 100mb para 2mb)
+app.use(express.json({ limit: '2mb' }));
+
+// 1. Limite Global
+const globalLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minuto
+    max: 200, // Limite de 200 requisições por IP
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests from this IP, please try again after a minute" }
+});
+app.use(globalLimiter);
+
+// 2. Limite para Autenticação (Brute Force Protection)
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 20, // Limite de 20 tentativas
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many authentication attempts, please try again after 15 minutes" }
+});
+
+// 3. Limite para Geração de IA (Prevenção de Abuso de Quota)
+const aiGenerationLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hora
+    max: 10, // Limite de 10 gerações por hora por IP
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many AI generation requests, please try again after an hour" }
+});
+
+const JWT_SECRET = process.env.JWT_SECRET || 'bisnoteka-super-secret-key-2026';
+
+export interface AuthRequest extends express.Request {
+    user?: {
+        id: string;
+        email: string;
+        role: string;
+    };
+}
+
+export const authenticateToken = (req: AuthRequest, res: express.Response, next: express.NextFunction): void => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        res.status(401).json({ error: "Access token required" });
+        return;
+    }
+
+    jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
+        if (err) {
+            res.status(403).json({ error: "Invalid or expired token" });
+            return;
+        }
+        req.user = decoded;
+        next();
+    });
+};
 
 const businessPayloadSchema = z.object({
     name: z.string().min(1).max(100),
@@ -74,7 +142,7 @@ const DOCUMENT_PROMPTS: Record<string, string> = {
     "Plano 1 Milhão Kz em 3 Meses": "Cria um Plano de Receita para gerar 1.000.000 Kz em 3 meses, formatado em Markdown, incluindo diagnóstico, meta, matemática da receita, oferta principal, oferta de entrada, oferta premium, funil, prospecção, calendário semanal, scripts comerciais, métricas e plano de contingência."
 };
 
-app.post('/api/business/generate', async (req: express.Request, res: express.Response): Promise<void> => {
+app.post('/api/business/generate', authenticateToken, aiGenerationLimiter, async (req: AuthRequest, res: express.Response): Promise<void> => {
     try {
         const parsedPayload = businessPayloadSchema.parse(req.body);
 
@@ -170,6 +238,7 @@ Retorna EXCLUSIVAMENTE um objeto JSON válido. NÃO DEVOLVAS MAIS NADA (sem back
 
         const savedBusiness = await prisma.business.create({
             data: {
+                userId: req.user!.id,
                 name: parsedPayload.name,
                 niche: JSON.stringify(parsedPayload.niche),
                 visualStyle: parsedPayload.visualStyle.length > 0 ? parsedPayload.visualStyle[0] : 'Indefinido',
@@ -208,6 +277,47 @@ app.get('/api/business', async (req: express.Request, res: express.Response) => 
         res.status(500).json({ error: "Failed to fetch businesses." });
     }
 });
+app.get('/api/user/business', authenticateToken, async (req: AuthRequest, res: express.Response) => {
+    try {
+        const businesses = await prisma.business.findMany({
+            where: { userId: req.user!.id },
+            orderBy: { createdAt: 'desc' }
+        });
+        
+        const parsedBusinesses = businesses.map((b: Business) => ({
+            ...b,
+            niche: JSON.parse(b.niche),
+            colorPalette: JSON.parse(b.colorPalette),
+            aiPayload: ((): any => { try { return JSON.parse(b.aiPayload); } catch { return b.aiPayload; } })()
+        }));
+
+        res.json(parsedBusinesses);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to fetch user businesses." });
+    }
+});
+
+app.get('/api/user/courses', authenticateToken, async (req: AuthRequest, res: express.Response) => {
+    try {
+        const enrollments = await prisma.enrollment.findMany({
+            where: { userId: req.user!.id },
+            include: { course: true },
+            orderBy: { enrolledAt: 'desc' }
+        });
+        
+        const courses = enrollments.map(e => ({
+            ...e.course,
+            progress: e.progress
+        }));
+
+        res.json(courses);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to fetch user courses." });
+    }
+});
+
 // ----------------------------------------------------
 // NOVO: Endpoints para Dados Reais
 // ----------------------------------------------------
@@ -484,37 +594,10 @@ app.get('/api/mindset', async (req, res) => {
 // AUTHENTICATION & ONBOARDING API
 // ====================================================
 
-const JWT_SECRET = process.env.JWT_SECRET || 'bisnoteka-super-secret-key-2026';
-
-interface AuthRequest extends express.Request {
-    user?: {
-        id: string;
-        email: string;
-        role: string;
-    };
-}
-
-const authenticateToken = (req: AuthRequest, res: express.Response, next: express.NextFunction): void => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        res.status(401).json({ error: "Access token required" });
-        return;
-    }
-
-    jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
-        if (err) {
-            res.status(403).json({ error: "Invalid or expired token" });
-            return;
-        }
-        req.user = decoded;
-        next();
-    });
-};
+// (Auth definitions moved to top of file)
 
 // 1. Register
-app.post('/api/auth/register', async (req: express.Request, res: express.Response): Promise<void> => {
+app.post('/api/auth/register', authLimiter, async (req: express.Request, res: express.Response): Promise<void> => {
     try {
         const { name, email, password } = req.body;
 
@@ -566,7 +649,7 @@ app.post('/api/auth/register', async (req: express.Request, res: express.Respons
 });
 
 // 2. Login
-app.post('/api/auth/login', async (req: express.Request, res: express.Response): Promise<void> => {
+app.post('/api/auth/login', authLimiter, async (req: express.Request, res: express.Response): Promise<void> => {
     try {
         const { email, password } = req.body;
 
