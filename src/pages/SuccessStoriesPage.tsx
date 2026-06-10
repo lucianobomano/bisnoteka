@@ -136,7 +136,7 @@ const SuccessStoriesPage: React.FC = () => {
                 justifyContent: 'center'
             }}>
                 <div style={{ width: '100%', maxWidth: '1800px', padding: '0 20px' }}>
-                    <h2 style={{ fontSize: '48px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '80px', textAlign: 'center', letterSpacing: '-2px' }}>Histórias em Destaque</h2>
+                    <h2 style={{ fontSize: isMobile ? '30px' : '48px', fontWeight: 900, textTransform: 'uppercase', marginBottom: isMobile ? '40px' : '80px', textAlign: 'center', letterSpacing: isMobile ? '-1px' : '-2px' }}>Histórias em Destaque</h2>
                     <div style={{
                         display: 'flex',
                         flexWrap: 'wrap',
@@ -216,12 +216,12 @@ const SuccessStoriesPage: React.FC = () => {
             {/* 3. Secção todas as histórias (Grid 5x4) */}
             <section style={{ padding: '120px 0', backgroundColor: '#ffffff' }}>
                 <div style={{ width: '100%', maxWidth: '1600px', margin: '0 auto', padding: '0 20px' }}>
-                    <h2 style={{ fontSize: '40px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '80px', letterSpacing: '-1px' }}>Todas as Histórias</h2>
+                    <h2 style={{ fontSize: isMobile ? '30px' : '40px', fontWeight: 900, textTransform: 'uppercase', marginBottom: isMobile ? '40px' : '80px', letterSpacing: '-1px', textAlign: isMobile ? 'center' : 'left' }}>Todas as Histórias</h2>
                     <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        gap: '60px 40px'
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(300px, 1fr))',
+                        gap: isMobile ? '24px 16px' : '60px 40px',
+                        justifyContent: 'center'
                     }}>
                         {currentStories.map((story, i) => (
                             <motion.div
@@ -230,14 +230,14 @@ const SuccessStoriesPage: React.FC = () => {
                                 whileInView={{ opacity: 1 }}
                                 whileHover={{ scale: 1.05 }}
                                 style={{
-                                    width: isMobile ? 'calc(50% - 20px)' : '305px',
+                                    width: '100%',
                                     textAlign: 'left',
                                     cursor: 'pointer'
                                 }}
                             >
                                 <div style={{
                                     width: '100%',
-                                    height: '270px',
+                                    height: isMobile ? '150px' : '270px',
                                     borderRadius: '24px',
                                     overflow: 'hidden',
                                     marginBottom: '20px',
@@ -245,7 +245,7 @@ const SuccessStoriesPage: React.FC = () => {
                                 }}>
                                     <img src={story.img} alt={story.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                                <h4 style={{ fontSize: '20px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '5px' }}>{story.name}</h4>
+                                <h4 style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '5px' }}>{story.name}</h4>
                                 <p style={{ fontSize: '12px', color: '#f83821', fontWeight: 900, textTransform: 'uppercase' }}>{story.company}</p>
                             </motion.div>
                         ))}

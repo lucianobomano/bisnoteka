@@ -57,7 +57,7 @@ const CoursesPage: React.FC = () => {
             <section style={{
                 backgroundColor: '#10171f',
                 color: '#ffffff',
-                padding: isMobile ? '120px 20px 80px' : '200px 60px 120px',
+                padding: isMobile ? '120px 20px 60px' : '200px 60px 120px',
                 textAlign: 'center',
                 position: 'relative',
                 overflow: 'hidden'
@@ -72,12 +72,12 @@ const CoursesPage: React.FC = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         style={{
-                            fontSize: isMobile ? '48px' : '110px',
+                            fontSize: isMobile ? '38px' : '110px',
                             fontWeight: 900,
-                            lineHeight: 0.9,
-                            letterSpacing: '-4px',
+                            lineHeight: isMobile ? 1.1 : 0.9,
+                            letterSpacing: isMobile ? '-1.5px' : '-4px',
                             textTransform: 'uppercase',
-                            marginBottom: '30px'
+                            marginBottom: '20px'
                         }}
                     >
                         DOMINE O JOGO <br /> <span style={{ color: '#f83821' }}>DOS NEGÓCIOS</span>
@@ -87,10 +87,10 @@ const CoursesPage: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                         style={{
-                            fontSize: isMobile ? '18px' : '24px',
+                            fontSize: isMobile ? '15px' : '24px',
                             color: '#888',
                             maxWidth: '700px',
-                            margin: '0 auto 50px',
+                            margin: isMobile ? '0 auto 30px' : '0 auto 50px',
                             lineHeight: 1.4
                         }}
                     >
@@ -100,23 +100,24 @@ const CoursesPage: React.FC = () => {
             </section>
 
             {/* 2. Cursos Section */}
-            <section style={{ padding: isMobile ? '60px 20px' : '100px 60px', backgroundColor: '#f6f7f9' }}>
+            <section style={{ padding: isMobile ? '40px 15px' : '100px 60px', backgroundColor: '#f6f7f9' }}>
                 <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
                     {/* Category Filtering */}
                     <div style={{
                         display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        gap: '15px',
-                        marginBottom: '60px'
-                    }}>
+                        gap: '10px',
+                        overflowX: 'auto',
+                        scrollbarWidth: 'none',
+                        paddingBottom: '10px',
+                        marginBottom: isMobile ? '30px' : '60px'
+                    }} className="no-scrollbar">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 style={{
-                                    padding: '12px 25px',
+                                    padding: isMobile ? '10px 20px' : '12px 25px',
                                     borderRadius: '9999px',
                                     border: activeCategory === cat ? 'none' : '1px solid #ddd',
                                     backgroundColor: activeCategory === cat ? '#f83821' : 'transparent',
@@ -125,7 +126,8 @@ const CoursesPage: React.FC = () => {
                                     fontWeight: 700,
                                     textTransform: 'uppercase',
                                     transition: 'all 0.3s ease',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap'
                                 }}
                             >
                                 {cat}
@@ -136,8 +138,8 @@ const CoursesPage: React.FC = () => {
                     {/* Grid de Cursos - Estilo Biblioteca Faundr */}
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
-                        gap: isMobile ? '30px' : '20px'
+                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                        gap: isMobile ? '15px' : '20px'
                     }}>
                         {filteredCourses.map((course, idx) => (
                             <motion.div
@@ -152,7 +154,7 @@ const CoursesPage: React.FC = () => {
                                     backdropFilter: 'blur(10px)',
                                     WebkitBackdropFilter: 'blur(10px)',
                                     borderRadius: '24px',
-                                    padding: '14px',
+                                    padding: isMobile ? '10px' : '14px',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     position: 'relative',
@@ -164,8 +166,8 @@ const CoursesPage: React.FC = () => {
                                 {/* Category Badge */}
                                 <div style={{
                                     position: 'absolute',
-                                    top: '20px',
-                                    right: '20px',
+                                    top: isMobile ? '15px' : '20px',
+                                    right: isMobile ? '15px' : '20px',
                                     backgroundColor: '#f83821',
                                     color: '#fff',
                                     padding: '5px 12px',
@@ -181,7 +183,7 @@ const CoursesPage: React.FC = () => {
                                 {/* Course Thumbnail - Aspect Ratio Estilo Livro */}
                                 <div style={{
                                     width: '100%',
-                                    height: '240px',
+                                    height: isMobile ? '160px' : '240px',
                                     backgroundColor: '#ddd',
                                     borderRadius: '12px',
                                     marginBottom: '20px',
@@ -204,7 +206,7 @@ const CoursesPage: React.FC = () => {
 
                                 {/* Info */}
                                 <h3 style={{
-                                    fontSize: '22px',
+                                    fontSize: isMobile ? '16px' : '22px',
                                     fontWeight: 900,
                                     color: '#10171f',
                                     marginBottom: '5px',
@@ -214,7 +216,7 @@ const CoursesPage: React.FC = () => {
                                     {course.title}
                                 </h3>
                                 <p style={{
-                                    fontSize: '12px',
+                                    fontSize: isMobile ? '11px' : '12px',
                                     color: '#666',
                                     marginBottom: '10px',
                                     display: '-webkit-box',
@@ -222,11 +224,11 @@ const CoursesPage: React.FC = () => {
                                     WebkitBoxOrient: 'vertical',
                                     overflow: 'hidden',
                                     lineHeight: '1.4',
-                                    height: '50px' // Ensure consistency
+                                    height: isMobile ? '40px' : '50px' // Ensure consistency
                                 }}>
                                     {course.description}
                                 </p>
-                                <p style={{ fontSize: '12px', color: '#10171f', fontWeight: 'bold', marginBottom: '15px' }}>
+                                <p style={{ fontSize: isMobile ? '11px' : '12px', color: '#10171f', fontWeight: 'bold', marginBottom: '15px' }}>
                                     {course.instructor}
                                 </p>
 
@@ -235,7 +237,7 @@ const CoursesPage: React.FC = () => {
                                     {[1, 2, 3, 4, 5].map((s) => (
                                         <Star
                                             key={s}
-                                            size={14}
+                                            size={isMobile ? 11 : 14}
                                             fill={s <= Math.floor(course.rating) ? "#f83821" : "none"}
                                             color="#f83821"
                                         />
@@ -250,7 +252,7 @@ const CoursesPage: React.FC = () => {
                                     <Link to={`/cursos/${course.id}`} style={{ textDecoration: 'none' }}>
                                         <button style={{
                                             width: '100%',
-                                            height: '54px',
+                                            height: isMobile ? '44px' : '54px',
                                             borderRadius: '12px',
                                             backgroundColor: '#10171f',
                                             display: 'flex',
@@ -282,24 +284,24 @@ const CoursesPage: React.FC = () => {
             <section style={{
                 backgroundColor: '#000000',
                 color: '#ffffff',
-                padding: isMobile ? '80px 20px' : '150px 60px',
+                padding: isMobile ? '60px 20px' : '150px 60px',
                 textAlign: 'center',
                 overflow: 'hidden',
                 position: 'relative'
             }}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', height: '100%', opacity: 0.1 }}>
-                    <div style={{ fontSize: '30vw', fontWeight: 900, color: '#white', opacity: 0.05, whiteSpace: 'nowrap' }}>MINDSET DISRUPTIVO</div>
+                    <div style={{ fontSize: '30vw', fontWeight: 900, color: 'white', opacity: 0.05, whiteSpace: 'nowrap' }}>MINDSET DISRUPTIVO</div>
                 </div>
 
                 <div style={{ position: 'relative', zIndex: 1, maxWidth: '1000px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: isMobile ? '36px' : '84px', fontWeight: 900, textTransform: 'uppercase', lineHeight: 0.9, marginBottom: '40px' }}>
+                    <h2 style={{ fontSize: isMobile ? '32px' : '84px', fontWeight: 900, textTransform: 'uppercase', lineHeight: isMobile ? 1.1 : 0.9, marginBottom: '30px' }}>
                         AFIE A SUA <br /> <span style={{ color: '#0011fd' }}>MENTALIDADE</span>
                     </h2>
-                    <p style={{ fontSize: isMobile ? '18px' : '28px', color: '#888', marginBottom: '60px', lineHeight: 1.4 }}>
+                    <p style={{ fontSize: isMobile ? '16px' : '28px', color: '#888', marginBottom: isMobile ? '40px' : '60px', lineHeight: 1.4 }}>
                         O sistema foi desenhado para te manter na média. Nós quebramos as correntes.
                     </p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '40px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '20px' : '40px' }}>
                         {[
                             { title: 'BRUTALIDADE', desc: 'Não há espaço para fraqueza quando se busca o topo.' },
                             { title: 'VELOCIDADE', desc: 'A execução supera a perfeição todos os dias.' },
@@ -331,14 +333,14 @@ const CoursesPage: React.FC = () => {
                     alignItems: isMobile ? 'center' : 'flex-start',
                     textAlign: isMobile ? 'center' : 'left'
                 }}>
-                    <p style={{ fontSize: isMobile ? '24px' : '40px', color: '#000000', marginBottom: '10px', fontWeight: 'normal' }}>
+                    <p style={{ fontSize: isMobile ? '20px' : '40px', color: '#000000', marginBottom: '10px', fontWeight: 'normal' }}>
                         apresentando a
                     </p>
-                    <p style={{ fontSize: isMobile ? '24px' : '40px', fontWeight: 900, color: '#000000', marginBottom: '10px', textTransform: 'lowercase' }}>
+                    <p style={{ fontSize: isMobile ? '20px' : '40px', fontWeight: 900, color: '#000000', marginBottom: '10px', textTransform: 'lowercase' }}>
                         faundr forge
                     </p>
                     <h2 style={{
-                        fontSize: isMobile ? '36px' : '70px',
+                        fontSize: isMobile ? '28px' : '70px',
                         fontWeight: 'bold',
                         color: '#000000',
                         marginBottom: '20px',
@@ -347,21 +349,22 @@ const CoursesPage: React.FC = () => {
                     }}>
                         a única associação que você precisa para construir qualquer negócio
                     </h2>
-                    <p style={{ fontSize: isMobile ? '20px' : '40px', fontWeight: 'bold', color: '#000000', margin: 0 }}>
+                    <p style={{ fontSize: isMobile ? '16px' : '40px', fontWeight: 'bold', color: '#000000', margin: 0 }}>
                         + aprenda com quem faz acontecer
                     </p>
-                    <p style={{ fontSize: isMobile ? '20px' : '40px', fontWeight: 900, color: '#000000', margin: 0 }}>
+                    <p style={{ fontSize: isMobile ? '16px' : '40px', fontWeight: 900, color: '#000000', margin: 0 }}>
                         + estruturas comprovadas
                     </p>
-                    <p style={{ fontSize: isMobile ? '20px' : '40px', fontWeight: 'bold', color: '#000000', marginBottom: '40px' }}>
+                    <p style={{ fontSize: isMobile ? '16px' : '40px', fontWeight: 'bold', color: '#000000', marginBottom: '40px' }}>
                         + comunidade com ideias semelhantes
                     </p>
                     <button style={{
-                        fontSize: isMobile ? '18px' : '20px',
+                        fontSize: isMobile ? '16px' : '20px',
                         backgroundColor: '#000000',
                         color: '#ffffff',
-                        width: isMobile ? '280px' : '330px',
-                        height: isMobile ? '80px' : '102px',
+                        width: isMobile ? '100%' : '330px',
+                        maxWidth: isMobile ? '320px' : 'none',
+                        height: isMobile ? '65px' : '102px',
                         borderRadius: '51px',
                         border: 'none',
                         fontWeight: 'bold',
@@ -380,18 +383,18 @@ const CoursesPage: React.FC = () => {
             {/* 5. Revista Section (Copied from Masterclasses/Home) */}
             <section style={{
                 backgroundColor: '#000000',
-                padding: isMobile ? '40px 20px' : '80px',
+                padding: isMobile ? '40px 15px' : '80px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
                 <p style={{
-                    fontSize: isMobile ? '20px' : '28px',
+                    fontSize: isMobile ? '16px' : '28px',
                     fontWeight: 400,
                     letterSpacing: isMobile ? '0' : '-2.5px',
                     lineHeight: '1.2',
                     color: '#ffffff',
-                    marginBottom: isMobile ? '30px' : '50px',
+                    marginBottom: isMobile ? '20px' : '50px',
                     textAlign: 'center',
                     maxWidth: isMobile ? '100%' : '900px'
                 }}>
@@ -417,6 +420,7 @@ const CoursesPage: React.FC = () => {
                             scrollbarWidth: 'none',
                             msOverflowStyle: 'none'
                         }}
+                        className="no-scrollbar"
                     >
                         {[
                             { image: 'MAG01.png', edition: 'Edição 1: Mar 15, 2023' },
@@ -436,8 +440,8 @@ const CoursesPage: React.FC = () => {
                                 }}
                             >
                                 <div style={{
-                                    width: isMobile ? '240px' : '430px',
-                                    height: isMobile ? '330px' : '592px',
+                                    width: isMobile ? '180px' : '430px',
+                                    height: isMobile ? '250px' : '592px',
                                     overflow: 'hidden',
                                     marginBottom: '15px'
                                 }}>
@@ -460,7 +464,8 @@ const CoursesPage: React.FC = () => {
                 </div>
 
                 <button style={{
-                    width: isMobile ? '280px' : '300px',
+                    width: isMobile ? '100%' : '300px',
+                    maxWidth: isMobile ? '320px' : 'none',
                     height: isMobile ? '60px' : '80px',
                     backgroundColor: '#0011FD',
                     borderRadius: '9999px',
@@ -470,7 +475,7 @@ const CoursesPage: React.FC = () => {
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     cursor: 'pointer',
-                    marginTop: '50px'
+                    marginTop: isMobile ? '30px' : '50px'
                 }}>
                     VER TODAS EDIÇÕES
                 </button>

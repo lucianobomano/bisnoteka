@@ -83,7 +83,7 @@ const ShopPage: React.FC = () => {
 
             {/* Hero Section */}
             <section style={{
-                padding: isMobile ? '140px 20px 80px' : '200px 60px 120px',
+                padding: isMobile ? '120px 20px 50px' : '200px 60px 120px',
                 textAlign: 'center',
                 position: 'relative',
                 zIndex: 1
@@ -98,24 +98,24 @@ const ShopPage: React.FC = () => {
                             <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2.5px' }}>Equipamento Original</span>
                         </div>
                         <h1 style={{
-                            fontSize: isMobile ? '56px' : '110px',
+                            fontSize: isMobile ? '38px' : '110px',
                             fontWeight: 900,
-                            letterSpacing: '-5px',
-                            lineHeight: 0.82,
-                            marginBottom: '40px',
+                            letterSpacing: isMobile ? '-1.5px' : '-5px',
+                            lineHeight: isMobile ? 1.05 : 0.82,
+                            marginBottom: '30px',
                             textTransform: 'uppercase'
                         }}>
                             <span style={{ color: '#0011fd' }}>LOJA</span> <br /> MODO FUNDADOR
                         </h1>
-                        <p style={{ color: '#888', fontSize: isMobile ? '18px' : '24px', maxWidth: '800px', margin: '0 auto 60px', lineHeight: 1.5, fontWeight: 500 }}>
+                        <p style={{ color: '#888', fontSize: isMobile ? '15px' : '24px', maxWidth: '800px', margin: isMobile ? '0 auto 40px' : '0 auto 60px', lineHeight: 1.5, fontWeight: 500 }}>
                             Ativos e ferramentas projetadas para quem não aceita o status quo. <br /> Hardware mental e vestuário táctico para a nova elite.
                         </p>
 
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '25px', flexWrap: 'wrap' }}>
-                            <button style={{ padding: '22px 50px', backgroundColor: '#f83821', color: '#fff', borderRadius: '99px', border: 'none', fontSize: '15px', fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 25px 50px rgba(248, 56, 33, 0.4)', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', alignItems: 'center', gap: '15px', width: '100%', maxWidth: isMobile ? '320px' : 'none', margin: '0 auto' }}>
+                            <button style={{ width: isMobile ? '100%' : 'auto', padding: isMobile ? '16px 30px' : '22px 50px', backgroundColor: '#f83821', color: '#fff', borderRadius: '99px', border: 'none', fontSize: '15px', fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', boxShadow: '0 25px 50px rgba(248, 56, 33, 0.4)', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
                                 Ver Roadmap Comercial <ArrowRight size={20} />
                             </button>
-                            <button style={{ padding: '22px 50px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '15px', fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', backdropFilter: 'blur(10px)' }}>
+                            <button style={{ width: isMobile ? '100%' : 'auto', padding: isMobile ? '16px 30px' : '22px 50px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '15px', fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 Catálogo PDF
                             </button>
                         </div>
@@ -126,17 +126,17 @@ const ShopPage: React.FC = () => {
             {/* Navigation Bar */}
             <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.05)', zIndex: 40 }}></div>
 
-            <section style={{ height: '130px', backgroundColor: 'rgba(16, 23, 31, 1)', zIndex: 39, borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center' }}>
-                <div style={{ maxWidth: '1440px', width: '100%', margin: '0 auto', padding: '0 20px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: '30px' }}>
+            <section style={{ height: isMobile ? 'auto' : '130px', padding: isMobile ? '30px 0' : '0', backgroundColor: 'rgba(16, 23, 31, 1)', zIndex: 39, borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center' }}>
+                <div style={{ maxWidth: '1440px', width: '100%', margin: '0 auto', padding: '0 20px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: isMobile ? '20px' : '30px' }}>
 
                     {/* Category Tabs */}
-                    <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+                    <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', scrollbarWidth: 'none', width: '100%' }} className="no-scrollbar">
                         {categories.map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 style={{
-                                    padding: '12px 28px',
+                                    padding: isMobile ? '10px 20px' : '12px 28px',
                                     backgroundColor: activeCategory === cat ? '#0011fd' : 'rgba(255,255,255,0.03)',
                                     border: '1px solid rgba(255,255,255,0.05)',
                                     borderRadius: '99px',
@@ -181,13 +181,13 @@ const ShopPage: React.FC = () => {
             </section>
 
             {/* Product Display Matrix */}
-            <main style={{ padding: '100px 0', position: 'relative', zIndex: 1 }}>
-                <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 20px' }}>
+            <main style={{ padding: isMobile ? '50px 0' : '100px 0', position: 'relative', zIndex: 1 }}>
+                <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 15px' }}>
 
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
-                        gap: '30px'
+                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                        gap: isMobile ? '15px' : '30px'
                     }}>
                         <AnimatePresence mode='popLayout'>
                             {filteredProducts.map((product, idx) => (
@@ -200,12 +200,12 @@ const ShopPage: React.FC = () => {
                                     transition={{ duration: 0.5, delay: idx * 0.08 }}
                                     style={{
                                         backgroundColor: '#1a222c',
-                                        borderRadius: '40px',
+                                        borderRadius: isMobile ? '24px' : '40px',
                                         overflow: 'hidden',
                                         border: '1px solid rgba(255,255,255,0.05)',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        height: '620px',
+                                        height: isMobile ? 'auto' : '620px',
                                         transition: 'all 0.4s ease',
                                         cursor: 'pointer'
                                     }}
@@ -219,7 +219,7 @@ const ShopPage: React.FC = () => {
                                     }}
                                 >
                                     {/* Visual Container */}
-                                    <div style={{ position: 'relative', height: '360px', width: '100%', overflow: 'hidden' }}>
+                                    <div style={{ position: 'relative', height: isMobile ? '160px' : '360px', width: '100%', overflow: 'hidden' }}>
                                         <img
                                             src={product.img}
                                             alt={product.title}
@@ -229,12 +229,12 @@ const ShopPage: React.FC = () => {
                                         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #1a222c 0%, transparent 60%)' }}></div>
 
                                         {/* Badges */}
-                                        <div style={{ position: 'absolute', top: '25px', left: '25px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                            <div style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', color: '#fff', padding: '6px 14px', borderRadius: '99px', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <div style={{ position: 'absolute', top: isMobile ? '12px' : '25px', left: isMobile ? '12px' : '25px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                            <div style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', color: '#fff', padding: isMobile ? '4px 10px' : '6px 14px', borderRadius: '99px', fontSize: isMobile ? '8px' : '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', border: '1px solid rgba(255,255,255,0.1)' }}>
                                                 {product.category}
                                             </div>
                                             {product.oldPrice && (
-                                                <div style={{ backgroundColor: '#f83821', color: '#fff', padding: '6px 14px', borderRadius: '99px', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', alignSelf: 'flex-start' }}>
+                                                <div style={{ backgroundColor: '#f83821', color: '#fff', padding: isMobile ? '4px 10px' : '6px 14px', borderRadius: '99px', fontSize: isMobile ? '8px' : '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', alignSelf: 'flex-start' }}>
                                                     Oferta Limitada
                                                 </div>
                                             )}
@@ -243,10 +243,10 @@ const ShopPage: React.FC = () => {
                                         {/* Action Circle */}
                                         <button style={{
                                             position: 'absolute',
-                                            right: '25px',
-                                            bottom: '25px',
-                                            width: '60px',
-                                            height: '60px',
+                                            right: isMobile ? '12px' : '25px',
+                                            bottom: isMobile ? '12px' : '25px',
+                                            width: isMobile ? '40px' : '60px',
+                                            height: isMobile ? '40px' : '60px',
                                             borderRadius: '50%',
                                             backgroundColor: '#0011fd',
                                             border: 'none',
@@ -259,36 +259,36 @@ const ShopPage: React.FC = () => {
                                             zIndex: 2,
                                             transition: 'all 0.3s'
                                         }}>
-                                            <ShoppingCart size={24} />
+                                            <ShoppingCart size={isMobile ? 18 : 24} />
                                         </button>
                                     </div>
 
                                     {/* Content Area */}
-                                    <div style={{ padding: '35px 30px 40px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+                                    <div style={{ padding: isMobile ? '20px 15px' : '35px 30px 40px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isMobile ? '8px' : '15px' }}>
                                             <div style={{ display: 'flex' }}>
                                                 {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} size={12} fill={i < Math.floor(product.rating) ? "#f83821" : "transparent"} color={i < Math.floor(product.rating) ? "#f83821" : "#555"} />
+                                                    <Star key={i} size={isMobile ? 10 : 12} fill={i < Math.floor(product.rating) ? "#f83821" : "transparent"} color={i < Math.floor(product.rating) ? "#f83821" : "#555"} />
                                                 ))}
                                             </div>
-                                            <span style={{ fontSize: '12px', color: '#555', fontWeight: 800 }}>{product.rating} / 5.0</span>
+                                            <span style={{ fontSize: isMobile ? '10px' : '12px', color: '#555', fontWeight: 800 }}>{product.rating}</span>
                                         </div>
 
-                                        <h3 style={{ fontSize: '30px', fontWeight: 900, textTransform: 'uppercase', lineHeight: 1.05, marginBottom: '20px', color: '#fff', letterSpacing: '-1px' }}>{product.title}</h3>
-                                        <p style={{ fontSize: '15px', color: '#888', lineHeight: 1.6, marginBottom: '35px', minHeight: '4.8em' }}>{product.description}</p>
+                                        <h3 style={{ fontSize: isMobile ? '18px' : '30px', fontWeight: 900, textTransform: 'uppercase', lineHeight: 1.1, marginBottom: isMobile ? '10px' : '20px', color: '#fff', letterSpacing: '-1px' }}>{product.title}</h3>
+                                        <p style={{ fontSize: isMobile ? '13px' : '15px', color: '#888', lineHeight: 1.5, marginBottom: isMobile ? '20px' : '35px', minHeight: isMobile ? 'auto' : '4.8em' }}>{product.description}</p>
 
-                                        <div style={{ paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                        <div style={{ paddingTop: isMobile ? '15px' : '30px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'stretch' }}>
                                             <div>
-                                                <p style={{ fontSize: '11px', color: '#555', fontWeight: 800, textTransform: 'uppercase', marginBottom: '5px', letterSpacing: '1px' }}>Preço de Ativo</p>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                                    <span style={{ fontSize: '28px', fontWeight: 900, color: '#fff' }}>{product.price}</span>
-                                                    {product.oldPrice && <span style={{ fontSize: '16px', color: '#444', textDecoration: 'line-through', fontWeight: 700 }}>{product.oldPrice}</span>}
+                                                <p style={{ fontSize: '9px', color: '#555', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px', letterSpacing: '1px' }}>Preço de Ativo</p>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                                    <span style={{ fontSize: isMobile ? '18px' : '28px', fontWeight: 900, color: '#fff' }}>{product.price}</span>
+                                                    {product.oldPrice && <span style={{ fontSize: isMobile ? '12px' : '16px', color: '#444', textDecoration: 'line-through', fontWeight: 700 }}>{product.oldPrice}</span>}
                                                 </div>
                                             </div>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: product.stock < 10 ? '#f83821' : '#00ff88', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase' }}>
-                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'currentColor' }}></div>
-                                                    {product.stock} un. restantes
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: product.stock < 10 ? '#f83821' : '#00ff88', fontSize: '9px', fontWeight: 900, textTransform: 'uppercase' }}>
+                                                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'currentColor' }}></div>
+                                                    {product.stock} rest.
                                                 </div>
                                             </div>
                                         </div>
@@ -312,16 +312,16 @@ const ShopPage: React.FC = () => {
             </main>
 
             {/* Industrial Features Section */}
-            <section style={{ padding: '120px 0', borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(255,255,255,0.01)', position: 'relative' }}>
-                <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 60px' }}>
-                    <div style={{ gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', display: 'grid', gap: '40px' }}>
+            <section style={{ padding: isMobile ? '60px 0' : '120px 0', borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(255,255,255,0.01)', position: 'relative' }}>
+                <div style={{ maxWidth: '1440px', margin: '0 auto', padding: isMobile ? '0 15px' : '0 60px' }}>
+                    <div style={{ gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', display: 'grid', gap: isMobile ? '20px' : '40px' }}>
                         {[
                             { icon: Zap, title: "Entrega Digital", desc: "Acesso imediato a todos os ativos digitais no momento do checkout." },
                             { icon: Package, title: "Logística Táctica", desc: "Hardware e vestuário entregue com protocolo de segurança em 48h." },
                             { icon: ShieldCheck, title: "Qualidade Auditada", desc: "Cada item passa por um rigoroso controlo de excelência fundador." },
                             { icon: Headphones, title: "Suporte Direto", desc: "Suporte humano especializado para implementação de ferramentas." }
                         ].map((item, i) => (
-                            <div key={i} style={{ padding: '40px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                            <div key={i} style={{ padding: isMobile ? '25px' : '40px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.03)' }}>
                                 <div style={{ width: '50px', height: '50px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', color: '#f83821' }}>
                                     <item.icon size={24} />
                                 </div>
@@ -334,22 +334,22 @@ const ShopPage: React.FC = () => {
             </section>
 
             {/* Premium CTA / Newsletter */}
-            <section style={{ padding: '150px 20px', backgroundColor: '#0011fd', position: 'relative', overflow: 'hidden' }}>
+            <section style={{ padding: isMobile ? '80px 20px' : '150px 20px', backgroundColor: '#0011fd', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', opacity: 0.1, pointerEvents: 'none' }}></div>
                 <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-                    <h2 style={{ fontSize: isMobile ? '40px' : '80px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-3.5px', lineHeight: 0.9, marginBottom: '30px' }}>
+                    <h2 style={{ fontSize: isMobile ? '32px' : '80px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: isMobile ? '-1.5px' : '-3.5px', lineHeight: 0.9, marginBottom: '30px' }}>
                         FAÇA PARTE DO <br /> SUPPLY CHAIN ELITE
                     </h2>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '20px', maxWidth: '650px', margin: '0 auto 60px', fontWeight: 600 }}>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: isMobile ? '16px' : '20px', maxWidth: '650px', margin: isMobile ? '0 auto 40px' : '0 auto 60px', fontWeight: 600 }}>
                         Receba acessos antecipados, drops exclusivos de vestuário e novas ferramentas antes do mercado saturar.
                     </p>
-                    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '15px', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '15px', justifyContent: 'center', alignItems: 'center', width: '100%', maxWidth: isMobile ? '320px' : 'none', margin: '0 auto' }}>
                         <input
                             type="email"
                             placeholder="Teu e-mail operacional"
-                            style={{ padding: '24px 35px', borderRadius: '99px', border: 'none', backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff', outline: 'none', width: isMobile ? '100%' : '450px', fontWeight: 600, fontSize: '16px', backdropFilter: 'blur(10px)' }}
+                            style={{ padding: isMobile ? '18px 25px' : '24px 35px', borderRadius: '99px', border: 'none', backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff', outline: 'none', width: '100%', maxWidth: isMobile ? '100%' : '450px', boxSizing: 'border-box', fontWeight: 600, fontSize: '16px', backdropFilter: 'blur(10px)', textAlign: isMobile ? 'center' : 'left' }}
                         />
-                        <button style={{ padding: '24px 50px', backgroundColor: '#fff', color: '#0011fd', borderRadius: '99px', border: 'none', fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>Aderir à Lista</button>
+                        <button style={{ padding: isMobile ? '18px 35px' : '24px 50px', backgroundColor: '#fff', color: '#0011fd', borderRadius: '99px', border: 'none', fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', width: isMobile ? '100%' : 'auto' }}>Aderir à Lista</button>
                     </div>
                 </div>
             </section>

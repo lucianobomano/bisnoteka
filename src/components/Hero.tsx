@@ -93,7 +93,8 @@ const Hero: React.FC = () => {
                             width: isMobile ? '100%' : '706px',
                             maxWidth: '100%',
                             height: isMobile ? 'auto' : '180px',
-                            border: '1px solid #232323',
+                            border: '2px solid #10171f',
+                            borderRadius: '16px',
                             marginTop: '0px',
                             padding: isMobile ? '30px 20px' : '0 80px'
                         }}

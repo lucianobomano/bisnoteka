@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     ChevronRight, ChevronDown, CheckCircle2,
@@ -10,6 +10,14 @@ import { Link } from 'react-router-dom';
 
 const FaundrMagazineLandingPage: React.FC = () => {
     const [faqOpen, setFaqOpen] = useState<number | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const toggleFaq = (index: number) => {
         setFaqOpen(faqOpen === index ? null : index);
@@ -22,7 +30,7 @@ const FaundrMagazineLandingPage: React.FC = () => {
             <div style={{ width: '100%', height: '4px', backgroundColor: '#0011fd' }}></div>
 
             {/* Hero Section */}
-            <section style={{ padding: '80px 20px 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <section style={{ padding: isMobile ? '40px 20px 0' : '80px 20px 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -35,16 +43,16 @@ const FaundrMagazineLandingPage: React.FC = () => {
                             backgroundColor: '#0011fd',
                             padding: '8px 24px',
                             borderRadius: '99px',
-                            marginBottom: '40px'
+                            marginBottom: isMobile ? '20px' : '40px'
                         }}>
                             <span style={{ fontSize: '13px', fontWeight: 600, textTransform: 'none', letterSpacing: '0' }}>Bem-Vindos a</span>
                         </div>
 
                         {/* Title */}
                         <h1 style={{
-                            fontSize: 'clamp(48px, 8vw, 95px)',
+                            fontSize: isMobile ? '38px' : 'clamp(48px, 8vw, 95px)',
                             fontWeight: 700,
-                            letterSpacing: '-2px',
+                            letterSpacing: isMobile ? '-1px' : '-2px',
                             lineHeight: 1,
                             marginBottom: '15px',
                             textTransform: 'none'
@@ -55,9 +63,9 @@ const FaundrMagazineLandingPage: React.FC = () => {
                         {/* Subtitle */}
                         <p style={{
                             color: 'rgba(255,255,255,0.6)',
-                            fontSize: '24px',
+                            fontSize: isMobile ? '16px' : '24px',
                             maxWidth: '700px',
-                            margin: '0 auto 40px',
+                            margin: isMobile ? '0 auto 24px' : '0 auto 40px',
                             lineHeight: 1.3,
                             fontWeight: 400
                         }}>
@@ -67,13 +75,13 @@ const FaundrMagazineLandingPage: React.FC = () => {
                         {/* Watch Presentation Button (The 360x103 one) */}
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0px' }}>
                             <button style={{
-                                width: '360px',
-                                height: '103px',
+                                width: isMobile ? '280px' : '360px',
+                                height: isMobile ? '70px' : '103px',
                                 backgroundColor: '#0011fd',
                                 color: '#ffffff',
                                 borderRadius: '99px',
                                 border: 'none',
-                                fontSize: '20px',
+                                fontSize: isMobile ? '16px' : '20px',
                                 fontWeight: 500,
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -82,7 +90,7 @@ const FaundrMagazineLandingPage: React.FC = () => {
                                 gap: '20px',
                                 transition: 'all 0.3s'
                             }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-                                Assitir apresentação
+                                Assistir apresentação
                                 <span style={{
                                     width: '0',
                                     height: '0',
@@ -123,14 +131,17 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Feature Cards Section */}
-            <section style={{ padding: '80px 20px' }}>
+            <section style={{ padding: isMobile ? '40px 20px' : '80px 20px' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{
                         display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
                         flexWrap: 'wrap',
                         justifyContent: 'center',
-                        gap: '10px',
-                        marginBottom: '60px'
+                        alignItems: 'center',
+                        gap: isMobile ? '20px' : '10px',
+                        marginBottom: isMobile ? '40px' : '60px',
+                        width: '100%'
                     }}>
                         {[
                             {
@@ -153,10 +164,11 @@ const FaundrMagazineLandingPage: React.FC = () => {
                                 key={i}
                                 whileHover={{ backgroundColor: '#464646', borderColor: '#464646' }}
                                 style={{
-                                    width: '280px',
-                                    height: '300px',
+                                    width: isMobile ? '100%' : '280px',
+                                    maxWidth: isMobile ? '340px' : 'none',
+                                    height: isMobile ? 'auto' : '300px',
                                     backgroundColor: '#191919',
-                                    padding: '20px 40px',
+                                    padding: '24px 30px',
                                     borderRadius: '10px',
                                     border: '1px solid #191919',
                                     textAlign: 'left',
@@ -191,13 +203,13 @@ const FaundrMagazineLandingPage: React.FC = () => {
                     <div style={{ textAlign: 'center' }}>
                         <Link to="/revista" style={{ textDecoration: 'none' }}>
                             <button style={{
-                                width: '350px',
-                                height: '80px',
+                                width: isMobile ? '280px' : '350px',
+                                height: isMobile ? '60px' : '80px',
                                 backgroundColor: '#0111FF',
                                 color: '#ffffff',
                                 borderRadius: '5px',
                                 border: 'none',
-                                fontSize: '38px',
+                                fontSize: isMobile ? '24px' : '38px',
                                 fontWeight: 600,
                                 cursor: 'pointer',
                                 transition: 'all 0.3s',
@@ -216,19 +228,19 @@ const FaundrMagazineLandingPage: React.FC = () => {
             <div style={{ maxWidth: '1000px', margin: '80px auto 0', borderBottom: '1px solid rgba(255,255,255,0.2)' }}></div>
 
             {/* O Que É Section */}
-            <section style={{ padding: '150px 20px', textAlign: 'center' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '150px 20px', textAlign: 'center' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-                    <div style={{ display: 'inline-block', marginBottom: '80px' }}>
-                        <h2 style={{ fontSize: '80px', fontWeight: 700, color: '#fff', margin: 0, textTransform: 'none' }}>O que é</h2>
-                        <div style={{ width: '100%', height: '12px', backgroundColor: '#0111FF', marginTop: '-5px' }}></div>
+                    <div style={{ display: 'inline-block', marginBottom: isMobile ? '30px' : '80px' }}>
+                        <h2 style={{ fontSize: isMobile ? '40px' : '80px', fontWeight: 700, color: '#fff', margin: 0, textTransform: 'none' }}>O que é</h2>
+                        <div style={{ width: '100%', height: isMobile ? '6px' : '12px', backgroundColor: '#0111FF', marginTop: '-5px' }}></div>
                     </div>
 
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '50px',
+                        gap: isMobile ? '24px' : '50px',
                         color: 'rgba(255,255,255,0.5)',
-                        fontSize: '24px',
+                        fontSize: isMobile ? '16px' : '24px',
                         lineHeight: 1.4,
                         fontWeight: 400,
                         maxWidth: '900px',
@@ -248,11 +260,11 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Objectivos Section */}
-            <section style={{ padding: '100px 20px', backgroundColor: '#000000' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '100px 20px', backgroundColor: '#000000' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                        <div style={{ fontSize: '24px', fontWeight: 700, color: '#0111FF', marginBottom: '10px' }}>O livro para dar mais motivação para os seus dias</div>
-                        <h2 style={{ fontSize: '90px', fontWeight: 700, textTransform: 'none', color: '#fff', margin: 0 }}>Objectivos</h2>
+                        <div style={{ fontSize: isMobile ? '16px' : '24px', fontWeight: 700, color: '#0111FF', marginBottom: '10px' }}>O livro para dar mais motivação para os seus dias</div>
+                        <h2 style={{ fontSize: isMobile ? '40px' : '90px', fontWeight: 700, textTransform: 'none', color: '#fff', margin: 0 }}>Objectivos</h2>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', alignItems: 'center' }}>
@@ -270,16 +282,19 @@ const FaundrMagazineLandingPage: React.FC = () => {
                                 key={i}
                                 whileHover={{ backgroundColor: '#464646' }}
                                 style={{
-                                    width: '718px',
-                                    height: '200px',
+                                    width: isMobile ? '100%' : '718px',
+                                    height: 'auto',
+                                    minHeight: isMobile ? 'auto' : '200px',
                                     backgroundColor: '#191919',
-                                    padding: '20px 30px',
+                                    padding: isMobile ? '30px 20px' : '20px 30px',
                                     borderRadius: '10px',
                                     display: 'flex',
-                                    gap: '30px',
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    gap: isMobile ? '20px' : '30px',
                                     alignItems: 'center',
                                     transition: 'background-color 0.3s',
-                                    cursor: 'default'
+                                    cursor: 'default',
+                                    textAlign: isMobile ? 'center' : 'left'
                                 }}
                             >
                                 <div style={{
@@ -314,11 +329,11 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Como Funciona Section */}
-            <section style={{ padding: '120px 20px', backgroundColor: '#000000' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '120px 20px', backgroundColor: '#000000' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
                     {/* Header with Blue Oval */}
                     <div style={{ position: 'relative', display: 'inline-block', marginBottom: '40px' }}>
-                        <h2 style={{ fontSize: '70px', fontWeight: 700, position: 'relative', zIndex: 1, margin: 0, color: '#fff' }}>Como funciona</h2>
+                        <h2 style={{ fontSize: isMobile ? '40px' : '70px', fontWeight: 700, position: 'relative', zIndex: 1, margin: 0, color: '#fff' }}>Como funciona</h2>
                         <div style={{
                             position: 'absolute',
                             top: '50%',
@@ -326,7 +341,7 @@ const FaundrMagazineLandingPage: React.FC = () => {
                             transform: 'translate(-50%, -50%) rotate(-1deg)',
                             width: '120%',
                             height: '140%',
-                            border: '10px solid #0111FF',
+                            border: isMobile ? '5px solid #0111FF' : '10px solid #0111FF',
                             borderRadius: '50% 50% 45% 55% / 55% 45% 55% 45%',
                             zIndex: 0
                         }}></div>
@@ -337,15 +352,15 @@ const FaundrMagazineLandingPage: React.FC = () => {
                         fontSize: '18px',
                         lineHeight: 1.4,
                         maxWidth: '800px',
-                        margin: '60px auto 100px',
+                        margin: isMobile ? '40px auto 60px' : '60px auto 100px',
                         fontWeight: 400
                     }}>
-                        A FAUNDR MAGAZINE ™ é uma revista mensal que será lançada no dia 1 de cada mês. Na véspera de cada lançamento, uma semana antes, será desenvolvida uma campanha de aquecimento monstrando os principais tópicos desta edição.
+                        A FAUNDR MAGAZINE ™ é uma revista mensal que será lançada no dia 1 de cada mês. Na véspera de cada lançamento, uma semana antes, será desenvolvida uma campanha de aquecimento mostrando os principais tópicos desta edição.
                     </p>
 
-                    <h3 style={{ fontSize: '48px', fontWeight: 700, marginBottom: '80px', color: '#fff' }}>Conteúdo abordado</h3>
+                    <h3 style={{ fontSize: isMobile ? '28px' : '48px', fontWeight: 700, marginBottom: isMobile ? '40px' : '80px', color: '#fff' }}>Conteúdo abordado</h3>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '50px' : '30px', alignItems: 'center', width: '100%' }}>
                         {[
                             {
                                 num: "#1",
@@ -355,7 +370,7 @@ const FaundrMagazineLandingPage: React.FC = () => {
                             },
                             {
                                 num: "#2",
-                                title: "Guias e dicas práticas para eampreendedores",
+                                title: "Guias e dicas práticas para empreendedores",
                                 desc: "Artigos práticos com dicas sobre como começar um negócio, gestão financeira, marketing, estratégias de crescimento, networking e outras habilidades essenciais para empreender.",
                                 circleSide: 'right'
                             },
@@ -372,21 +387,28 @@ const FaundrMagazineLandingPage: React.FC = () => {
                                 circleSide: 'right'
                             }
                         ].map((card, i) => (
-                            <div key={i} style={{ position: 'relative', width: '934px', height: '180px' }}>
+                            <div key={i} style={{ 
+                                position: 'relative', 
+                                width: '100%', 
+                                maxWidth: isMobile ? '450px' : '934px',
+                                height: 'auto',
+                                marginTop: isMobile ? '30px' : '0px'
+                            }}>
                                 {/* Number Circle */}
                                 <div style={{
                                     position: 'absolute',
-                                    top: '50%',
-                                    [card.circleSide === 'left' ? 'left' : 'right']: '-50px',
-                                    transform: 'translateY(-50%)',
-                                    width: '100px',
-                                    height: '100px',
+                                    top: isMobile ? '0px' : '50%',
+                                    left: isMobile ? '50%' : card.circleSide === 'left' ? '-50px' : 'auto',
+                                    right: isMobile ? 'auto' : card.circleSide === 'right' ? '-50px' : 'auto',
+                                    transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)',
+                                    width: isMobile ? '60px' : '100px',
+                                    height: isMobile ? '60px' : '100px',
                                     backgroundColor: '#0111FF',
                                     borderRadius: '50%',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '44px',
+                                    fontSize: isMobile ? '24px' : '44px',
                                     fontWeight: 700,
                                     zIndex: 2,
                                     color: '#fff',
@@ -398,31 +420,78 @@ const FaundrMagazineLandingPage: React.FC = () => {
                                 {/* Content Box */}
                                 <div style={{
                                     width: '100%',
-                                    height: '100%',
                                     backgroundColor: '#000',
                                     borderRadius: '0px',
                                     display: 'flex',
-                                    alignItems: 'center',
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    alignItems: 'stretch',
                                     overflow: 'hidden',
-                                    border: '1px solid #191919'
+                                    border: '1px solid #191919',
+                                    paddingTop: isMobile ? '40px' : '0px'
                                 }}>
                                     {card.circleSide === 'left' ? (
                                         <>
-                                            <div style={{ width: '35%', height: '100%', padding: '30px 40px', textAlign: 'left', backgroundColor: '#191919', display: 'flex', alignItems: 'center' }}>
-                                                <h4 style={{ fontSize: '22px', fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.2 }}>{card.title}</h4>
+                                            <div style={{ 
+                                                width: isMobile ? '100%' : '35%', 
+                                                padding: isMobile ? '20px 24px 10px' : '30px 40px', 
+                                                textAlign: isMobile ? 'center' : 'left', 
+                                                backgroundColor: '#191919', 
+                                                display: 'flex', 
+                                                alignItems: 'center',
+                                                justifyContent: isMobile ? 'center' : 'flex-start'
+                                            }}>
+                                                <h4 style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.2 }}>{card.title}</h4>
                                             </div>
-                                            <div style={{ width: '65%', height: '100%', padding: '30px 40px', textAlign: 'left', color: 'rgba(255,255,255,0.7)', fontSize: '16px', display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ 
+                                                width: isMobile ? '100%' : '65%', 
+                                                padding: isMobile ? '10px 24px 30px' : '30px 40px', 
+                                                textAlign: isMobile ? 'center' : 'left', 
+                                                color: 'rgba(255,255,255,0.7)', 
+                                                fontSize: isMobile ? '14px' : '16px', 
+                                                display: 'flex', 
+                                                alignItems: 'center' 
+                                            }}>
                                                 {card.desc}
                                             </div>
                                         </>
                                     ) : (
                                         <>
-                                            <div style={{ width: '65%', height: '100%', padding: '30px 40px', textAlign: 'center', color: 'rgba(255,255,255,0.7)', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <div style={{ maxWidth: '480px' }}>{card.desc}</div>
-                                            </div>
-                                            <div style={{ width: '35%', height: '100%', padding: '30px 40px', textAlign: 'left', backgroundColor: '#191919', display: 'flex', alignItems: 'center' }}>
-                                                <h4 style={{ fontSize: '22px', fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.2 }}>{card.title}</h4>
-                                            </div>
+                                            {isMobile ? (
+                                                <>
+                                                    <div style={{ 
+                                                        width: '100%', 
+                                                        padding: '20px 24px 10px', 
+                                                        textAlign: 'center', 
+                                                        backgroundColor: '#191919', 
+                                                        display: 'flex', 
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}>
+                                                        <h4 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.2 }}>{card.title}</h4>
+                                                    </div>
+                                                    <div style={{ 
+                                                        width: '100%', 
+                                                        padding: '10px 24px 30px', 
+                                                        textAlign: 'center', 
+                                                        color: 'rgba(255,255,255,0.7)', 
+                                                        fontSize: '14px', 
+                                                        display: 'flex', 
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}>
+                                                        {card.desc}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div style={{ width: '65%', height: '100%', padding: '30px 40px', textAlign: 'center', color: 'rgba(255,255,255,0.7)', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <div style={{ maxWidth: '480px' }}>{card.desc}</div>
+                                                    </div>
+                                                    <div style={{ width: '35%', height: '100%', padding: '30px 40px', textAlign: 'left', backgroundColor: '#191919', display: 'flex', alignItems: 'center' }}>
+                                                        <h4 style={{ fontSize: '22px', fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.2 }}>{card.title}</h4>
+                                                    </div>
+                                                </>
+                                            )}
                                         </>
                                     )}
                                 </div>
@@ -433,17 +502,18 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Para quem é esta Revista Section */}
-            <section style={{ padding: '150px 20px', backgroundColor: '#000000' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '150px 20px', backgroundColor: '#000000' }}>
                 <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: '70px', fontWeight: 700, textAlign: 'center', marginBottom: '100px', color: '#fff' }}>Para quem é esta Revista</h2>
+                    <h2 style={{ fontSize: isMobile ? '36px' : '70px', fontWeight: 700, textAlign: 'center', marginBottom: isMobile ? '40px' : '100px', color: '#fff' }}>Para quem é esta Revista</h2>
 
                     <div style={{
                         display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        gap: '0px',
+                        gap: isMobile ? '30px' : '0px',
                         position: 'relative',
-                        padding: '0 40px'
+                        padding: isMobile ? '0 10px' : '0 40px'
                     }}>
                         {[
                             {
@@ -481,15 +551,15 @@ const FaundrMagazineLandingPage: React.FC = () => {
                             }
                         ].map((card, i) => (
                             <div key={i} style={{
-                                width: '360px',
-                                height: card.isCenter ? '540px' : '460px',
+                                width: isMobile ? '100%' : '360px',
+                                height: isMobile ? 'auto' : card.isCenter ? '540px' : '460px',
                                 backgroundColor: card.isCenter ? '#141414' : '#0a0a0a',
                                 border: '2px solid #0111FF',
                                 borderRadius: '15px',
-                                padding: '50px 40px',
+                                padding: isMobile ? '30px 20px' : '50px 40px',
                                 zIndex: card.isCenter ? 2 : 1,
-                                marginLeft: i === 0 ? '0' : '-20px',
-                                marginRight: i === 2 ? '0' : '-20px',
+                                marginLeft: isMobile ? '0' : i === 0 ? '0' : '-20px',
+                                marginRight: isMobile ? '0' : i === 2 ? '0' : '-20px',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 transition: 'all 0.3s ease',
@@ -522,31 +592,31 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* How It Helps Section */}
-            <section style={{ padding: '120px 20px', backgroundColor: '#000' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '120px 20px', backgroundColor: '#000' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: '70px', fontWeight: 700, textAlign: 'center', marginBottom: '100px', color: '#fff' }}>Como esta Revista vai ajudar-te?</h2>
+                    <h2 style={{ fontSize: isMobile ? '36px' : '70px', fontWeight: 700, textAlign: 'center', marginBottom: isMobile ? '40px' : '100px', color: '#fff' }}>Como esta Revista vai ajudar-te?</h2>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '60px', alignItems: 'center' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr', gap: isMobile ? '30px' : '60px', alignItems: 'center' }}>
                         <div style={{ position: 'relative' }}>
                             <img src="/faundr_magazine/WTF.png" style={{ width: '100%', height: 'auto', display: 'block' }} alt="Revista fan" />
                         </div>
 
-                        <div style={{ textAlign: 'left' }}>
-                            <h3 style={{ fontSize: '32px', fontWeight: 700, color: '#fff', marginBottom: '40px' }}>Aprenda mais sobre empreendedorismo</h3>
+                        <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
+                            <h3 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: 700, color: '#fff', marginBottom: isMobile ? '20px' : '40px' }}>Aprenda mais sobre empreendedorismo</h3>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', marginBottom: '60px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: isMobile ? '30px' : '60px' }}>
                                 {[
                                     { title: "Paixão (O que você ama)", desc: "Representa as atividades que trazem alegria e entusiasmo. São as coisas que você faria mesmo se não fossem remuneradas." },
                                     { title: "Missão (O que o mundo precisa)", desc: "Refere-se às atividades que contribuem para algo maior do que você mesmo, proporcionando um senso de propósito e significado." },
                                     { title: "Vocação (O que você é bom em)", desc: "Envolve as habilidades e talentos naturais que você possui, aquelas em que se destaca naturalmente." },
                                     { title: "Profissão (O que você pode ser pago para fazer)", desc: "Relaciona-se com as atividades que podem fornecer sustento financeiro e estabilidade." }
                                 ].map((item, i) => (
-                                    <div key={i} style={{ display: 'flex', gap: '20px' }}>
+                                    <div key={i} style={{ display: 'flex', gap: '20px', textAlign: 'left' }}>
                                         <div style={{ color: 'rgba(255,255,255,0.7)', marginTop: '5px' }}>
                                             <CheckCircle2 size={24} />
                                         </div>
                                         <div>
-                                            <p style={{ margin: 0, fontSize: '18px', lineHeight: 1.4, color: 'rgba(255,255,255,0.4)' }}>
+                                            <p style={{ margin: 0, fontSize: isMobile ? '15px' : '18px', lineHeight: 1.4, color: 'rgba(255,255,255,0.4)' }}>
                                                 <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{item.title}:</strong> {item.desc}
                                             </p>
                                         </div>
@@ -556,12 +626,12 @@ const FaundrMagazineLandingPage: React.FC = () => {
 
                             <Link to="/revista" style={{ textDecoration: 'none' }}>
                                 <button style={{
-                                    padding: '25px 60px',
+                                    padding: isMobile ? '15px 40px' : '25px 60px',
                                     backgroundColor: '#0111FF',
                                     color: '#ffffff',
                                     borderRadius: '8px',
                                     border: 'none',
-                                    fontSize: '24px',
+                                    fontSize: isMobile ? '18px' : '24px',
                                     fontWeight: 700,
                                     cursor: 'pointer',
                                     transition: 'all 0.3s'
@@ -575,12 +645,12 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Profissionais de Desenvolvimento Pessoal Section */}
-            <section style={{ padding: '120px 20px', backgroundColor: '#000' }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '60px', alignItems: 'center' }}>
-                    <div style={{ textAlign: 'left' }}>
-                        <h3 style={{ fontSize: '32px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '40px' }}>Profissionais de Desenvolvimento Pessoal</h3>
+            <section style={{ padding: isMobile ? '60px 20px' : '120px 20px', backgroundColor: '#000' }}>
+                <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.2fr', gap: isMobile ? '30px' : '60px', alignItems: 'center' }}>
+                    <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
+                        <h3 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: isMobile ? '20px' : '40px' }}>Profissionais de Desenvolvimento Pessoal</h3>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', marginBottom: '60px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: isMobile ? '30px' : '60px' }}>
                             {[
                                 { title: "Inspirar Protagonismo Diário", desc: "Cada frase deste e-book é uma faísca para despertar o protagonista interior em sua audiência." },
                                 { title: "Fornecer Motivação Sustentável", desc: "Com técnicas de neuromarketing, o e-book é projetado para oferecer uma motivação consistente e sustentável." },
@@ -588,11 +658,11 @@ const FaundrMagazineLandingPage: React.FC = () => {
                                 { title: "Promover a Mentalidade de Conquista", desc: "Ao internalizar as mensagens diárias, sua audiência será moldada por uma mentalidade de conquista" },
                                 { title: "Estimular o Crescimento Contínuo", desc: "O e-book serve como um catalisador para o desenvolvimento pessoal contínuo." }
                             ].map((item, i) => (
-                                <div key={i} style={{ display: 'flex', gap: '20px' }}>
+                                <div key={i} style={{ display: 'flex', gap: '20px', textAlign: 'left' }}>
                                     <div style={{ color: 'rgba(255,255,255,0.8)', marginTop: '5px' }}>
                                         <CheckCircle2 size={24} />
                                     </div>
-                                    <p style={{ margin: 0, fontSize: '18px', lineHeight: 1.4, color: 'rgba(255,255,255,0.4)', maxWidth: '500px' }}>
+                                    <p style={{ margin: 0, fontSize: isMobile ? '15px' : '18px', lineHeight: 1.4, color: 'rgba(255,255,255,0.4)', maxWidth: '500px' }}>
                                         <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{item.title}:</strong> {item.desc}
                                     </p>
                                 </div>
@@ -601,13 +671,13 @@ const FaundrMagazineLandingPage: React.FC = () => {
 
                         <Link to="/revista" style={{ textDecoration: 'none' }}>
                             <button style={{
-                                width: '250px',
-                                height: '70px',
+                                width: isMobile ? '200px' : '250px',
+                                height: isMobile ? '56px' : '70px',
                                 backgroundColor: '#0111FF',
                                 color: '#ffffff',
                                 borderRadius: '5px',
                                 border: 'none',
-                                fontSize: '24px',
+                                fontSize: isMobile ? '18px' : '24px',
                                 fontWeight: 700,
                                 cursor: 'pointer',
                                 transition: 'all 0.3s'
@@ -624,13 +694,13 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Algumas Páginas da Revista Section */}
-            <section style={{ padding: '100px 20px', backgroundColor: '#000' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '100px 20px', backgroundColor: '#000' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                     <h2 style={{
-                        fontSize: '32px',
+                        fontSize: isMobile ? '24px' : '32px',
                         fontWeight: 700,
                         textAlign: 'center',
-                        marginBottom: '80px',
+                        marginBottom: isMobile ? '40px' : '80px',
                         color: 'rgba(255,255,255,0.7)',
                         textTransform: 'uppercase',
                         letterSpacing: '2px'
@@ -640,8 +710,8 @@ const FaundrMagazineLandingPage: React.FC = () => {
 
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(4, 1fr)',
-                        gap: '20px'
+                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                        gap: isMobile ? '12px' : '20px'
                     }}>
                         {[
                             "/faundr_magazine/pages/210.png",
@@ -681,8 +751,8 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Mockup Display Section */}
-            <section style={{ padding: '80px 20px 120px', backgroundColor: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ maxWidth: '1000px', width: '100%', marginBottom: '80px', textAlign: 'center' }}>
+            <section style={{ padding: isMobile ? '40px 20px 60px' : '80px 20px 120px', backgroundColor: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ maxWidth: '1000px', width: '100%', marginBottom: isMobile ? '40px' : '80px', textAlign: 'center' }}>
                     <img
                         src="/faundr_magazine/102145.png"
                         style={{
@@ -698,13 +768,13 @@ const FaundrMagazineLandingPage: React.FC = () => {
 
                 <Link to="/revista" style={{ textDecoration: 'none' }}>
                     <button style={{
-                        width: '350px',
-                        height: '80px',
+                        width: isMobile ? '280px' : '350px',
+                        height: isMobile ? '60px' : '80px',
                         backgroundColor: '#0111FF',
                         color: '#ffffff',
                         borderRadius: '5px',
                         border: 'none',
-                        fontSize: '38px',
+                        fontSize: isMobile ? '24px' : '38px',
                         fontWeight: 700,
                         cursor: 'pointer',
                         transition: 'all 0.3s'
@@ -715,23 +785,24 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Pricing Section */}
-            <section style={{ padding: '100px 20px', backgroundColor: '#000' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '100px 20px', backgroundColor: '#000' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '2px' }}>Preço</div>
-                    <h2 style={{ fontSize: '60px', fontWeight: 700, marginBottom: '20px', color: '#fff' }}>Comprar o livro</h2>
-                    <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', maxWidth: '700px', margin: '0 auto 80px', lineHeight: 1.5 }}>
+                    <h2 style={{ fontSize: isMobile ? '36px' : '60px', fontWeight: 700, marginBottom: '20px', color: '#fff' }}>Comprar o livro</h2>
+                    <p style={{ fontSize: isMobile ? '16px' : '20px', color: 'rgba(255,255,255,0.6)', maxWidth: '700px', margin: isMobile ? '0 auto 40px' : '0 auto 80px', lineHeight: 1.5 }}>
                         O diferencial marcante deste livro reside na sua abordagem personalizada e prática para inspirar a jornada de cada leitor.
                     </p>
 
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', flexWrap: 'wrap' }}>
                         {/* Card 1 */}
                         <div style={{
-                            width: '395px',
-                            minHeight: '770px',
+                            width: isMobile ? '100%' : '395px',
+                            maxWidth: isMobile ? '400px' : 'none',
+                            minHeight: isMobile ? 'auto' : '770px',
                             backgroundColor: '#191919',
                             border: '1px solid #0111FF',
                             borderRadius: '20px',
-                            padding: '60px 40px',
+                            padding: isMobile ? '40px 24px' : '60px 40px',
                             textAlign: 'left',
                             display: 'flex',
                             flexDirection: 'column'
@@ -779,12 +850,13 @@ const FaundrMagazineLandingPage: React.FC = () => {
 
                         {/* Card 2 */}
                         <div style={{
-                            width: '395px',
-                            minHeight: '770px',
+                            width: isMobile ? '100%' : '395px',
+                            maxWidth: isMobile ? '400px' : 'none',
+                            minHeight: isMobile ? 'auto' : '770px',
                             backgroundColor: '#191919',
                             border: '1px solid #0111FF',
                             borderRadius: '20px',
-                            padding: '60px 40px',
+                            padding: isMobile ? '40px 24px' : '60px 40px',
                             textAlign: 'left',
                             display: 'flex',
                             flexDirection: 'column'
@@ -832,11 +904,11 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* FAQ Section */}
-            <section style={{ padding: '120px 20px', backgroundColor: '#000' }}>
+            <section style={{ padding: isMobile ? '60px 20px' : '120px 20px', backgroundColor: '#000' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '80px' }}>
                         <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '2px' }}>FAQ</div>
-                        <h2 style={{ fontSize: '64px', fontWeight: 700, color: '#fff' }}>Ainda tem dúvidas?</h2>
+                        <h2 style={{ fontSize: isMobile ? '36px' : '64px', fontWeight: 700, color: '#fff' }}>Ainda tem dúvidas?</h2>
                     </div>
 
                     <div style={{ display: 'grid' }}>
@@ -863,18 +935,18 @@ const FaundrMagazineLandingPage: React.FC = () => {
                                         cursor: 'pointer',
                                     }}
                                 >
-                                    <h4 style={{ fontSize: '20px', fontWeight: 400, color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                                    <h4 style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 400, color: 'rgba(255,255,255,0.7)', margin: 0, paddingRight: '10px' }}>
                                         {i + 1}. {faq.q}
                                     </h4>
                                     <div style={{ color: 'rgba(255,255,255,0.4)' }}>
-                                        <ChevronDown size={28} style={{
+                                        <ChevronDown size={isMobile ? 20 : 28} style={{
                                             transform: faqOpen === i ? 'rotate(180deg)' : 'none',
                                             transition: 'transform 0.3s ease'
                                         }} />
                                     </div>
                                 </div>
                                 {faqOpen === i && (
-                                    <div style={{ padding: '0 0 40px', color: 'rgba(255,255,255,0.4)', fontSize: '18px', lineHeight: 1.6 }}>
+                                    <div style={{ padding: '0 0 40px', color: 'rgba(255,255,255,0.4)', fontSize: isMobile ? '15px' : '18px', lineHeight: 1.6 }}>
                                         {faq.a}
                                     </div>
                                 )}
@@ -885,11 +957,11 @@ const FaundrMagazineLandingPage: React.FC = () => {
             </section>
 
             {/* Final Footer CTA */}
-            <section style={{ padding: '150px 20px', textAlign: 'center', borderTop: '1px solid #222' }}>
-                <h1 style={{ fontSize: '10vw', fontWeight: 900, letterSpacing: '-5px', color: 'rgba(255,255,255,0.05)', marginBottom: '-40px' }}>FAUNDR</h1>
-                <h2 style={{ fontSize: '48px', fontWeight: 900, marginBottom: '40px' }}>Pronto para o Próximo Nível?</h2>
+            <section style={{ padding: isMobile ? '80px 20px' : '150px 20px', textAlign: 'center', borderTop: '1px solid #222', overflow: 'hidden' }}>
+                <h1 style={{ fontSize: '10vw', fontWeight: 900, letterSpacing: '-5px', color: 'rgba(255,255,255,0.05)', marginBottom: isMobile ? '-15px' : '-40px' }}>FAUNDR</h1>
+                <h2 style={{ fontSize: isMobile ? '28px' : '48px', fontWeight: 900, marginBottom: isMobile ? '20px' : '40px' }}>Pronto para o Próximo Nível?</h2>
                 <Link to="/revista">
-                    <button style={{ padding: '25px 80px', backgroundColor: '#0011fd', color: '#fff', borderRadius: '99px', border: 'none', fontWeight: 900, fontSize: '18px' }}>LER AGORA</button>
+                    <button style={{ padding: isMobile ? '15px 40px' : '25px 80px', backgroundColor: '#0011fd', color: '#fff', borderRadius: '99px', border: 'none', fontWeight: 900, fontSize: isMobile ? '16px' : '18px' }}>LER AGORA</button>
                 </Link>
             </section>
 

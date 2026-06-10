@@ -65,7 +65,7 @@ const Books: React.FC<BooksProps> = () => {
                             fontWeight: 900,
                             color: '#10171f',
                             lineHeight: 1,
-                            letterSpacing: '-3px',
+                            letterSpacing: isMobile ? '-1.5px' : '-3px',
                             textTransform: 'uppercase',
                             marginBottom: '20px'
                         }}
@@ -105,13 +105,13 @@ const Books: React.FC<BooksProps> = () => {
             </section>
 
             {/* Books Grid */}
-            <section style={{ padding: isMobile ? '0 20px' : '0 80px', paddingBottom: '100px' }}>
+            <section style={{ padding: isMobile ? '0 15px' : '0 80px', paddingBottom: '100px' }}>
                 <div style={{
                     maxWidth: '1400px',
                     margin: '0 auto',
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
-                    gap: isMobile ? '30px' : '50px'
+                    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: isMobile ? '16px' : '50px'
                 }}>
                     {books.map((book, idx) => (
                         <motion.div
@@ -123,8 +123,8 @@ const Books: React.FC<BooksProps> = () => {
                                 backgroundColor: 'rgba(255, 255, 255, 0.7)',
                                 backdropFilter: 'blur(10px)',
                                 WebkitBackdropFilter: 'blur(10px)',
-                                borderRadius: '24px',
-                                padding: '24px',
+                                borderRadius: isMobile ? '16px' : '24px',
+                                padding: isMobile ? '12px' : '24px',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 position: 'relative',
@@ -136,13 +136,13 @@ const Books: React.FC<BooksProps> = () => {
                             {/* Type Badge */}
                             <div style={{
                                 position: 'absolute',
-                                top: '20px',
-                                right: '20px',
+                                top: isMobile ? '10px' : '20px',
+                                right: isMobile ? '10px' : '20px',
                                 backgroundColor: book.type === 'Físico' ? '#10171f' : book.type === 'Ebook' ? '#0011fd' : '#f83821',
                                 color: '#fff',
-                                padding: '5px 12px',
+                                padding: isMobile ? '3px 8px' : '5px 12px',
                                 borderRadius: '9999px',
-                                fontSize: '10px',
+                                fontSize: isMobile ? '8px' : '10px',
                                 fontWeight: 800,
                                 textTransform: 'uppercase',
                                 zIndex: 2
@@ -150,50 +150,61 @@ const Books: React.FC<BooksProps> = () => {
                                 {book.type}
                             </div>
 
-                            {/* Book Cover Placeholder */}
+                            {/* Book Cover Container */}
                             <div style={{
                                 width: '100%',
                                 aspectRatio: '3/4',
-                                backgroundColor: '#ddd',
-                                borderRadius: '12px',
-                                marginBottom: '20px',
+                                backgroundColor: '#f3f4f6',
+                                borderRadius: isMobile ? '8px' : '12px',
+                                marginBottom: isMobile ? '12px' : '20px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 overflow: 'hidden',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                position: 'relative'
                             }}>
-                                <div style={{ textAlign: 'center', padding: '20px' }}>
-                                    <BookOpen size={60} color="#999" strokeWidth={1} />
-                                    <p style={{ marginTop: '10px', color: '#999', fontSize: '12px', fontWeight: 600 }}>CAPA DO LIVRO</p>
+                                {book.image ? (
+                                    <img
+                                        src={book.image.startsWith('http') ? book.image : `/media/${book.image}`}
+                                        alt={book.title}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                        }}
+                                    />
+                                ) : null}
+                                <div style={{ position: 'absolute', zIndex: 0, textAlign: 'center', padding: '20px' }}>
+                                    <BookOpen size={isMobile ? 36 : 60} color="#ccc" strokeWidth={1} />
+                                    <p style={{ marginTop: '10px', color: '#ccc', fontSize: isMobile ? '10px' : '12px', fontWeight: 600 }}>CAPA DO LIVRO</p>
                                 </div>
                             </div>
 
                             {/* Info */}
-                            <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#10171f', marginBottom: '5px', textTransform: 'uppercase', lineHeight: 1.1 }}>
+                            <h3 style={{ fontSize: isMobile ? '14px' : '22px', fontWeight: 900, color: '#10171f', marginBottom: '5px', textTransform: 'uppercase', lineHeight: 1.1 }}>
                                 {book.title}
                             </h3>
-                            <p style={{ fontSize: '16px', color: '#666', marginBottom: '15px' }}>{book.author}</p>
+                            <p style={{ fontSize: isMobile ? '12px' : '16px', color: '#666', marginBottom: isMobile ? '8px' : '15px' }}>{book.author}</p>
 
                             {/* Rating */}
-                            <div style={{ display: 'flex', gap: '2px', marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', gap: '2px', marginBottom: isMobile ? '12px' : '20px', alignItems: 'center' }}>
                                 {[1, 2, 3, 4, 5].map((s) => (
-                                    <Star key={s} size={14} fill={s <= Math.floor(book.rating) ? "#f83821" : "none"} color="#f83821" />
+                                    <Star key={s} size={isMobile ? 10 : 14} fill={s <= Math.floor(book.rating) ? "#f83821" : "none"} color="#f83821" />
                                 ))}
-                                <span style={{ fontSize: '12px', fontWeight: 700, marginLeft: '5px', color: '#10171f' }}>{book.rating}</span>
+                                <span style={{ fontSize: isMobile ? '10px' : '12px', fontWeight: 700, marginLeft: '5px', color: '#10171f' }}>{book.rating}</span>
                             </div>
 
                             {/* Price & Action */}
-                            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '5px' }}>
                                 <div>
                                     {book.oldPrice && (
-                                        <p style={{ fontSize: '14px', color: '#999', textDecoration: 'line-through', marginBottom: '2px' }}>AKZ {book.oldPrice}</p>
+                                        <p style={{ fontSize: isMobile ? '10px' : '14px', color: '#999', textDecoration: 'line-through', marginBottom: '2px' }}>AKZ {book.oldPrice}</p>
                                     )}
-                                    <p style={{ fontSize: '24px', fontWeight: 900, color: '#10171f' }}>AKZ {book.price}</p>
+                                    <p style={{ fontSize: isMobile ? '14px' : '24px', fontWeight: 900, color: '#10171f' }}>AKZ {book.price}</p>
                                 </div>
                                 <button style={{
-                                    width: '50px',
-                                    height: '50px',
+                                    width: isMobile ? '36px' : '50px',
+                                    height: isMobile ? '36px' : '50px',
                                     borderRadius: '50%',
                                     backgroundColor: '#10171f',
                                     display: 'flex',
@@ -201,9 +212,10 @@ const Books: React.FC<BooksProps> = () => {
                                     justifyContent: 'center',
                                     color: '#fff',
                                     border: 'none',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    flexShrink: 0
                                 }}>
-                                    <ShoppingCart size={20} />
+                                    <ShoppingCart size={isMobile ? 16 : 20} />
                                 </button>
                             </div>
                         </motion.div>

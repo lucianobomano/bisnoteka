@@ -589,7 +589,7 @@ const Masterclasses: React.FC = () => {
                                 }}
                             >
                                 {/* Image Container */}
-                                <div style={{ width: isMobile ? '280px' : '260px', height: isMobile ? '280px' : '260px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden' }}>
+                                <div style={{ width: isMobile ? '100%' : '260px', height: isMobile ? 'auto' : '260px', maxWidth: '280px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden' }}>
                                     <img
                                         src={`/media/${card.image}`}
                                         alt={card.title}
@@ -794,7 +794,7 @@ const Masterclasses: React.FC = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '30px' : '40px', width: isMobile ? '100%' : 'auto', alignItems: 'center' }}>
 
                     {/* Card 1 - Propósito (number left) */}
-                    <div style={{ width: isMobile ? '320px' : '966px', height: isMobile ? '420px' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '100%' : '966px', maxWidth: '100%', height: isMobile ? 'auto' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
                         <div style={{ width: isMobile ? '100%' : '274px', height: '194px', backgroundColor: '#10171f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ fontSize: '200px', color: '#f83821', fontWeight: 700, lineHeight: '1' }}>01</span>
                         </div>
@@ -805,7 +805,7 @@ const Masterclasses: React.FC = () => {
                     </div>
 
                     {/* Card 2 - OCN (number right) */}
-                    <div style={{ width: isMobile ? '320px' : '966px', height: isMobile ? '420px' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '100%' : '966px', maxWidth: '100%', height: isMobile ? 'auto' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', overflow: 'hidden' }}>
                         <div style={{ flex: 1, padding: isMobile ? '20px' : '0 50px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <h3 style={{ fontSize: isMobile ? '20px' : '30px', color: '#091747', letterSpacing: '-1.5px', fontWeight: 700, marginBottom: '10px' }}>OCN - OPORTUNIDADES E CRIAÇÃO DE NEGÓCIO</h3>
                             <p style={{ fontSize: isMobile ? '14px' : '22px', lineHeight: '1.2', color: '#091747', maxWidth: isMobile ? '100%' : '591px' }}>Aprenda a olhar no mercado de uma outra perspectiva e enxergue as oportunidades que a maioria das pessoas não vê e saia na frente</p>
@@ -816,7 +816,7 @@ const Masterclasses: React.FC = () => {
                     </div>
 
                     {/* Card 3 - Branding (number left) */}
-                    <div style={{ width: isMobile ? '320px' : '966px', height: isMobile ? '420px' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '100%' : '966px', maxWidth: '100%', height: isMobile ? 'auto' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
                         <div style={{ width: isMobile ? '100%' : '274px', height: '194px', backgroundColor: '#f83821', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ fontSize: '200px', color: '#ffffff', fontWeight: 700, lineHeight: '1' }}>03</span>
                         </div>
@@ -827,7 +827,7 @@ const Masterclasses: React.FC = () => {
                     </div>
 
                     {/* Card 4 - Estratégia (number right) */}
-                    <div style={{ width: isMobile ? '320px' : '966px', height: isMobile ? '420px' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '100%' : '966px', maxWidth: '100%', height: isMobile ? 'auto' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', overflow: 'hidden' }}>
                         <div style={{ flex: 1, padding: isMobile ? '20px' : '0 50px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <h3 style={{ fontSize: isMobile ? '20px' : '30px', color: '#091747', letterSpacing: '-1.5px', fontWeight: 700, marginBottom: '10px' }}>ESTRATÉGIA E INOVAÇÃO</h3>
                             <p style={{ fontSize: isMobile ? '14px' : '22px', lineHeight: '1.2', color: '#091747', maxWidth: isMobile ? '100%' : '591px' }}>Aprenda como criar e gerenciar modelos estratégicos para conduzir o seu negócio.</p>
@@ -838,7 +838,7 @@ const Masterclasses: React.FC = () => {
                     </div>
 
                     {/* Card 5 - Finanças (number left) */}
-                    <div style={{ width: isMobile ? '320px' : '966px', height: isMobile ? '420px' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '100%' : '966px', maxWidth: '100%', height: isMobile ? 'auto' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
                         <div style={{ width: isMobile ? '100%' : '274px', height: '194px', backgroundColor: '#0011fd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ fontSize: '200px', color: '#ffffff', fontWeight: 700, lineHeight: '1' }}>05</span>
                         </div>
@@ -849,7 +849,7 @@ const Masterclasses: React.FC = () => {
                     </div>
 
                     {/* Card 6 - Soft Skills (number right) */}
-                    <div style={{ width: isMobile ? '320px' : '966px', height: isMobile ? '420px' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '100%' : '966px', maxWidth: '100%', height: isMobile ? 'auto' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', overflow: 'hidden' }}>
                         <div style={{ flex: 1, padding: isMobile ? '20px' : '0 50px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <h3 style={{ fontSize: isMobile ? '20px' : '30px', color: '#091747', letterSpacing: '-1.5px', fontWeight: 700, marginBottom: '10px' }}>SOFT SKILLS</h3>
                             <p style={{ fontSize: isMobile ? '14px' : '22px', lineHeight: '1.2', color: '#091747', maxWidth: isMobile ? '100%' : '591px' }}>Entenda como essas habilidades podem ser un grande aliado na busca pela ascensão no mercado.</p>
@@ -860,7 +860,7 @@ const Masterclasses: React.FC = () => {
                     </div>
 
                     {/* Card 7 - Liderança (number left) */}
-                    <div style={{ width: isMobile ? '320px' : '966px', height: isMobile ? '420px' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '100%' : '966px', maxWidth: '100%', height: isMobile ? 'auto' : '194px', backgroundColor: '#ffffff', display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
                         <div style={{ width: isMobile ? '100%' : '274px', height: '194px', backgroundColor: '#10171f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ fontSize: '200px', color: '#0011fd', fontWeight: 700, lineHeight: '1' }}>07</span>
                         </div>
