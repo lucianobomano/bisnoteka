@@ -8,6 +8,7 @@ export interface User {
   subscriptionTier: string;
   onboardingCompleted: boolean;
   onboardingData: string | null;
+  avatarUrl?: string | null;
 }
 
 interface AuthContextType {

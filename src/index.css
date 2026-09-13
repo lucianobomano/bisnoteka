@@ -10,20 +10,43 @@
   --white: #ffffff;
   --black: #000000;
 
+  /* Theme variables (Light mode by default) */
+  --bg-color: #ffffff;
+  --text-color: #10171f;
+  --card-bg: #f9fafb;
+  --card-border: #e5e7eb;
+  --sidebar-bg: #f3f4f6;
+  --sidebar-border: #e5e7eb;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --text-muted: #6b7280;
+
   --font-main: 'Roboto', sans-serif;
 
   font-family: var(--font-main);
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light;
-  color: var(--navy);
-  background-color: var(--white);
+  color-scheme: light dark;
+  color: var(--text-color);
+  background-color: var(--bg-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme="dark"] {
+  --bg-color: #0c1219;
+  --text-color: #f8fafc;
+  --card-bg: #10171f;
+  --card-border: rgba(255, 255, 255, 0.05);
+  --sidebar-bg: #10171f;
+  --sidebar-border: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(0, 0, 0, 0.2);
+  --input-border: rgba(255, 255, 255, 0.08);
+  --text-muted: #94a3b8;
 }
 
 * {
@@ -38,7 +61,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
-  background-color: var(--white);
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 h1,

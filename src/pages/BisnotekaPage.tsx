@@ -26,8 +26,6 @@ const BisnotekaPage: React.FC = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-
-
     const [businessIdeas, setBusinessIdeas] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -74,13 +72,13 @@ const BisnotekaPage: React.FC = () => {
     ];
 
     return (
-        <div style={{ backgroundColor: '#10171f', minHeight: '100vh', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', color: '#10171f', fontFamily: 'Inter, sans-serif' }}>
 
             {/* Header / Hero */}
             <section style={{
                 padding: isMobile ? '120px 20px 60px' : '180px 60px 80px',
-                backgroundColor: '#10171f',
-                color: '#fff',
+                backgroundColor: '#ffffff',
+                color: '#10171f',
                 textAlign: 'center'
             }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -100,7 +98,7 @@ const BisnotekaPage: React.FC = () => {
                         </h1>
                         <p style={{
                             fontSize: isMobile ? '18px' : '22px',
-                            color: '#888',
+                            color: '#555',
                             maxWidth: '700px',
                             margin: '0 auto 40px',
                             lineHeight: 1.4
@@ -145,7 +143,7 @@ const BisnotekaPage: React.FC = () => {
             <div style={{
                 width: '100%',
                 height: '1px',
-                backgroundColor: 'rgba(255,255,255,0.05)',
+                backgroundColor: '#e5e7eb',
                 position: 'sticky',
                 top: '75px',
                 zIndex: 40
@@ -169,23 +167,24 @@ const BisnotekaPage: React.FC = () => {
                                     transition={{ delay: idx * 0.05 }}
                                     onClick={() => navigate(`/bisnoteka/${idea.id}`)}
                                     style={{
-                                        backgroundColor: '#1a222c',
-                                        borderRadius: '24px',
+                                        backgroundColor: '#ffffff',
+                                        borderRadius: '12px',
                                         overflow: 'hidden',
                                         padding: isMobile ? '10px' : '14px',
                                         width: '100%',
                                         cursor: 'pointer',
-                                        border: '1px solid rgba(255,255,255,0.05)',
-                                        transition: 'transform 0.3s ease',
+                                        border: '1px solid #e5e7eb',
+                                        boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                                        transition: 'transform 0.3s ease, border-color 0.3s ease',
                                         display: 'flex',
                                         flexDirection: 'column',
                                         margin: isMobile ? '0 auto' : '0',
                                         boxSizing: 'border-box'
                                     }}
                                     onMouseEnter={(e) => e.currentTarget.style.borderColor = '#f83821'}
-                                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
                                 >
-                                    <div style={{ width: '100%', height: isMobile ? '140px' : '240px', borderRadius: '16px', overflow: 'hidden', marginBottom: '15px', position: 'relative' }}>
+                                    <div style={{ width: '100%', height: isMobile ? '140px' : '240px', borderRadius: '12px', overflow: 'hidden', marginBottom: '15px', position: 'relative' }}>
                                         <img src={idea.img} alt={idea.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         <div style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: '#f83821', color: '#fff', padding: '4px 10px', borderRadius: '99px', fontSize: '9px', fontWeight: 900, textTransform: 'uppercase' }}>
                                             {idea.category}
@@ -193,18 +192,17 @@ const BisnotekaPage: React.FC = () => {
                                     </div>
 
                                     <div style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                                        <h3 style={{ fontSize: isMobile ? '15px' : '20px', fontWeight: 900, color: '#fff', marginBottom: '8px', textTransform: 'uppercase', lineHeight: 1.1 }}>{idea.title}</h3>
-                                        <p style={{ fontSize: isMobile ? '11px' : '14px', color: '#888', marginBottom: '15px', height: isMobile ? '32px' : '42px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: '1.3' }}>
+                                        <h3 style={{ fontSize: isMobile ? '15px' : '20px', fontWeight: 900, color: '#10171f', marginBottom: '8px', textTransform: 'uppercase', lineHeight: 1.1 }}>{idea.title}</h3>
+                                        <p style={{ fontSize: isMobile ? '11px' : '14px', color: '#666', marginBottom: '15px', height: isMobile ? '32px' : '42px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: '1.3' }}>
                                             {idea.description}
                                         </p>
-
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '20px' }}>
-                                            <div style={{ padding: isMobile ? '8px' : '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
-                                                <p style={{ fontSize: '8px', color: '#555', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>Invest</p>
-                                                <p style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: 800, color: '#fff' }}>{idea.investment}</p>
+                                            <div style={{ padding: isMobile ? '8px' : '12px', backgroundColor: '#f6f7f9', borderRadius: '12px' }}>
+                                                <p style={{ fontSize: '8px', color: '#888', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>Invest</p>
+                                                <p style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: 800, color: '#10171f' }}>{idea.investment}</p>
                                             </div>
-                                            <div style={{ padding: isMobile ? '8px' : '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
-                                                <p style={{ fontSize: '8px', color: '#555', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>Potencial</p>
+                                            <div style={{ padding: isMobile ? '8px' : '12px', backgroundColor: '#f6f7f9', borderRadius: '12px' }}>
+                                                <p style={{ fontSize: '8px', color: '#888', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>Potencial</p>
                                                 <p style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: 800, color: '#00c853' }}>{idea.potential}</p>
                                             </div>
                                         </div>
@@ -236,11 +234,11 @@ const BisnotekaPage: React.FC = () => {
                 </section>
 
                 {/* Section: Ficheiros incluídos */}
-                <section style={{ marginBottom: isMobile ? '60px' : '120px', backgroundColor: 'rgba(255,255,255,0.01)', padding: isMobile ? '60px 0' : '100px 0' }}>
+                <section style={{ marginBottom: isMobile ? '60px' : '120px', backgroundColor: '#f6f7f9', padding: isMobile ? '60px 0' : '100px 0' }}>
                     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
                         <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '60px' }}>
-                            <h2 style={{ fontSize: isMobile ? '28px' : '48px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', marginBottom: '15px', letterSpacing: '-2px' }}>O que recebes em cada blueprint</h2>
-                            <p style={{ color: '#888', fontSize: isMobile ? '15px' : '18px' }}>Não vendemos apenas ideias, vendemos a execução completa.</p>
+                            <h2 style={{ fontSize: isMobile ? '28px' : '48px', fontWeight: 900, color: '#10171f', textTransform: 'uppercase', marginBottom: '15px', letterSpacing: '-2px' }}>O que recebes em cada blueprint</h2>
+                            <p style={{ color: '#555', fontSize: isMobile ? '15px' : '18px' }}>Não vendemos apenas ideias, vendemos a execução completa.</p>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
@@ -250,17 +248,17 @@ const BisnotekaPage: React.FC = () => {
                                 { name: 'Brandbook e Logotipo Editável', desc: 'Identidade visual pronta para usar.', icon: <ImageIcon color="#0011fd" /> },
                                 { name: 'Sumário Executivo para Bancos', desc: 'Documentação pronta para pedir financiamento.', icon: <ShieldCheck color="#ff9800" /> },
                                 { name: 'Estratégia de Marketing Digital', desc: 'Plano de tráfego pago e redes sociais.', icon: <Layout color="#e91e63" /> },
-                                { name: 'Checklist de Lançamento (Go-to-market)', desc: 'Calendário de passos para os primeiros 30 dias.', icon: <Terminal color="#fff" /> },
+                                { name: 'Checklist de Lançamento (Go-to-market)', desc: 'Calendário de passos para os primeiros 30 dias.', icon: <Terminal color="#10171f" /> },
                                 { name: 'Modelos de Contratos Legais', desc: 'Termos com fornecedores e clientes.', icon: <FileText color="#888" /> },
                                 { name: 'Lista de Fornecedores API/Físicos', desc: 'Contactos diretos de quem precisas.', icon: <ShoppingBag color="#b388ff" /> }
                             ].map((item, i) => (
-                                <div key={i} style={{ padding: '30px', backgroundColor: '#1a222c', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-                                    <div style={{ minWidth: '50px', height: '50px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div key={i} style={{ padding: '30px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+                                    <div style={{ minWidth: '50px', height: '50px', backgroundColor: '#f6f7f9', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         {item.icon}
                                     </div>
                                     <div>
-                                        <h4 style={{ color: '#fff', fontSize: '16px', fontWeight: 800, marginBottom: '8px' }}>{item.name}</h4>
-                                        <p style={{ color: '#888', fontSize: '13px', lineHeight: 1.5 }}>{item.desc}</p>
+                                        <h4 style={{ color: '#10171f', fontSize: '16px', fontWeight: 800, marginBottom: '8px' }}>{item.name}</h4>
+                                        <p style={{ color: '#666', fontSize: '13px', lineHeight: 1.5 }}>{item.desc}</p>
                                     </div>
                                 </div>
                             ))}
@@ -273,8 +271,8 @@ const BisnotekaPage: React.FC = () => {
                     <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 20px' }}>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '15px' }}>
                             {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                                <div key={n} style={{ width: '100%', height: isMobile ? '160px' : '350px', backgroundColor: '#1a222c', borderRadius: '20px', overflow: 'hidden' }}>
-                                    <img src={`https://images.unsplash.com/photo-${1550000000000 + (n * 100000)}?q=80&w=800&auto=format&fit=crop`} alt="Showcase" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} />
+                                <div key={n} style={{ width: '100%', height: isMobile ? '160px' : '350px', backgroundColor: '#f0f0f0', borderRadius: '12px', overflow: 'hidden' }}>
+                                    <img src={`https://images.unsplash.com/photo-${1550000000000 + (n * 100000)}?q=80&w=800&auto=format&fit=crop`} alt="Showcase" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                             ))}
                         </div>
@@ -284,8 +282,8 @@ const BisnotekaPage: React.FC = () => {
                 {/* Section: Classificação */}
                 <section style={{ marginBottom: isMobile ? '60px' : '100px' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', padding: isMobile ? '0 15px' : '0 20px' }}>
-                        <div style={{ backgroundColor: '#1a222c', borderRadius: '32px', padding: isMobile ? '25px 15px' : '60px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <h2 style={{ fontSize: isMobile ? '24px' : '42px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', marginBottom: isMobile ? '25px' : '40px', textAlign: 'center', letterSpacing: '-1.5px' }}>Top Ideias deste Mês</h2>
+                        <div style={{ backgroundColor: '#f6f7f9', borderRadius: '12px', padding: isMobile ? '25px 15px' : '60px', border: '1px solid #e5e7eb' }}>
+                            <h2 style={{ fontSize: isMobile ? '24px' : '42px', fontWeight: 900, color: '#10171f', textTransform: 'uppercase', marginBottom: isMobile ? '25px' : '40px', textAlign: 'center', letterSpacing: '-1.5px' }}>Top Ideias deste Mês</h2>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                                 {[
                                     { rank: 1, name: 'Micro-SaaS Gestão Mercados', score: 98 },
@@ -294,13 +292,13 @@ const BisnotekaPage: React.FC = () => {
                                     { rank: 4, name: 'EduTech para Escolas Rurais', score: 85 },
                                     { rank: 5, name: 'Fintech de Micro-Crédito', score: 82 }
                                 ].map((item, i) => (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '15px 10px' : '24px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '15px 10px' : '24px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '20px' }}>
-                                            <div style={{ width: isMobile ? '36px' : '44px', height: isMobile ? '36px' : '44px', backgroundColor: i === 0 ? '#f83821' : '#10171f', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#fff', fontSize: isMobile ? '14px' : '18px', flexShrink: 0 }}>
+                                            <div style={{ width: isMobile ? '36px' : '44px', height: isMobile ? '36px' : '44px', backgroundColor: i === 0 ? '#f83821' : '#e5e7eb', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: i === 0 ? '#fff' : '#10171f', fontSize: isMobile ? '14px' : '18px', flexShrink: 0 }}>
                                                 {item.rank}
                                             </div>
                                             <div>
-                                                <h4 style={{ color: '#fff', fontSize: isMobile ? '13px' : '18px', fontWeight: 800 }}>{item.name}</h4>
+                                                <h4 style={{ color: '#10171f', fontSize: isMobile ? '13px' : '18px', fontWeight: 800 }}>{item.name}</h4>
                                                 <div style={{ display: 'flex', gap: '2px', marginTop: '6px' }}>
                                                     {[1, 2, 3, 4, 5].map(s => <Star key={s} size={10} fill="#f83821" color="#f83821" />)}
                                                 </div>
@@ -308,7 +306,7 @@ const BisnotekaPage: React.FC = () => {
                                         </div>
                                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                             <div style={{ fontSize: isMobile ? '18px' : '24px', fontWeight: 900, color: '#00c853' }}>{item.score}%</div>
-                                            {!isMobile && <div style={{ fontSize: '11px', color: '#555', fontWeight: 900, textTransform: 'uppercase' }}>Fator Viabilidade</div>}
+                                            {!isMobile && <div style={{ fontSize: '11px', color: '#888', fontWeight: 900, textTransform: 'uppercase' }}>Fator Viabilidade</div>}
                                         </div>
                                     </div>
                                 ))}
@@ -320,16 +318,16 @@ const BisnotekaPage: React.FC = () => {
 
             {/* Newsletter CTA */}
             <section style={{
-                backgroundColor: '#10171f',
+                backgroundColor: '#f6f7f9',
                 padding: isMobile ? '60px 15px' : '100px 20px',
                 textAlign: 'center',
-                color: '#fff',
-                borderTop: '1px solid rgba(255,255,255,0.05)'
+                color: '#10171f',
+                borderTop: '1px solid #e5e7eb'
             }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <TrendingUp size={48} color="#f83821" style={{ marginBottom: '25px' }} />
                     <h2 style={{ fontSize: isMobile ? '28px' : '56px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '20px', lineHeight: 1.1 }}>Receba Novas Ideias <br /> Toda Semana</h2>
-                    <p style={{ color: '#888', marginBottom: '40px', fontSize: isMobile ? '15px' : '18px' }}>Junte-se a outros 15,000 faundrs que recebem análises de mercado exclusivas diretamente no email.</p>
+                    <p style={{ color: '#555', marginBottom: '40px', fontSize: isMobile ? '15px' : '18px' }}>Junte-se a outros 15,000 faundrs que recebem análises de mercado exclusivas diretamente no email.</p>
                     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '15px', justifyContent: 'center', width: '100%', maxWidth: isMobile ? '320px' : 'none', margin: '0 auto' }}>
                         <input
                             type="email"
@@ -337,9 +335,9 @@ const BisnotekaPage: React.FC = () => {
                             style={{
                                 padding: '20px 30px',
                                 borderRadius: '99px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                backgroundColor: 'rgba(255,255,255,0.05)',
-                                color: '#fff',
+                                border: '1px solid #d1d5db',
+                                backgroundColor: '#ffffff',
+                                color: '#10171f',
                                 width: isMobile ? '100%' : '400px',
                                 fontSize: '16px',
                                 outline: 'none',

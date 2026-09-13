@@ -27,22 +27,6 @@ const Header: React.FC = () => {
           {/* Navigation Menu */}
           <nav className="flex items-center" style={{ gap: '30px' }}>
             <Link
-              to="/"
-              className="hover:text-white transition-all duration-300 relative group py-2 font-normal tracking-widest text-white/70"
-              style={{ fontSize: '15px', textDecoration: 'none' }}
-            >
-              Home
-              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f83821] transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link
-              to="/livros"
-              className="hover:text-white transition-all duration-300 relative group py-2 font-normal tracking-widest text-white/70"
-              style={{ fontSize: '15px', textDecoration: 'none' }}
-            >
-              Livros
-              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f83821] transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link
               to="/sucesso"
               className="hover:text-white transition-all duration-300 relative group py-2 whitespace-nowrap font-normal tracking-widest text-white/70"
               style={{ fontSize: '15px', textDecoration: 'none' }}
@@ -101,30 +85,37 @@ const Header: React.FC = () => {
                   }}
                 >
                   {[
+                    { name: '+114 Ideias de Renda Extra', path: '/livro-114-ideias', highlight: true },
+                    { name: 'Livros', path: '/livros' },
                     { name: 'Loja', path: '/loja' },
                     { name: 'Cursos', path: '/cursos' },
                     { name: 'Faundr Forge', path: '/forge' },
                     { name: 'Faundr Experience', path: '/experience' },
                     { name: 'Mindset Disruptivo', path: '/disruptivo' },
-                    { name: 'Recursos', path: '/' }
+                    { name: 'Recursos', path: '/recursos' },
+                    { name: 'Oportunidades', path: '/oportunidades' }
                   ].map((item, idx) => (
                     <Link
                       key={idx}
                       to={item.path}
                       onClick={() => setIsDropdownOpen(false)}
-                      className="hover:text-[#f83821] transition-colors text-white/80"
-                      style={{ fontSize: '18px', fontWeight: 400, textDecoration: 'none' }}
+                      className={item.highlight ? "text-[#22c55e] hover:text-[#4ade80] font-bold flex items-center justify-between" : "hover:text-[#f83821] transition-colors text-white/80"}
+                      style={{ fontSize: '17px', textDecoration: 'none' }}
                     >
-                      {item.name}
+                      <span>{item.name}</span>
+                      {item.highlight && (
+                        <span style={{ fontSize: '10px', backgroundColor: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)', padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase' }}>
+                          NOVO
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>
               )}
             </div>
           </nav>
-
           {/* Separator */}
-          <div style={{ width: '1px', height: '30px', backgroundColor: 'rgba(255,255,255,0.1)' }}></div>
+          <div style={{ width: '1px', height: '30px', backgroundColor: 'rgba(255,255,255,0.1)', marginLeft: '10px' }}></div>
 
           {/* CTAs */}
           <div className="flex items-center" style={{ gap: '12px' }}>
@@ -222,32 +213,35 @@ const Header: React.FC = () => {
           >
             <img src="/LOGO H.svg" alt="Bisnoteka Logo" style={{ height: '100%', width: 'auto' }} />
           </Link>
-          <button
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            <X size={20} color="white" />
-          </button>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <button
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <X size={20} color="white" />
+            </button>
+          </div>
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
           {[
-            { name: 'Home', path: '/' },
+            { name: '+114 Ideias Lucrativas (E-book)', path: '/livro-114-ideias', highlight: true },
             { name: 'Livros', path: '/livros' },
             { name: 'Histórias de Sucesso', path: '/sucesso' },
             { name: 'Revista', path: '/faundr-magazine' },
             { name: 'Podcasts', path: '/podcasts' },
             { name: 'Bisnoteka', path: '/bisnoteka' },
+            { name: 'Recursos', path: '/recursos' },
             ...(user ? [{ name: 'Área de Membros', path: '/membros' }] : [])
           ].map((link) => (
             <Link
@@ -256,16 +250,24 @@ const Header: React.FC = () => {
               onClick={() => setIsMenuOpen(false)}
               style={{
                 fontSize: '15px',
-                fontWeight: 400,
-                color: 'white',
+                fontWeight: link.highlight ? 700 : 400,
+                color: link.highlight ? '#4ade80' : 'white',
                 textDecoration: 'none',
                 padding: '18px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                 letterSpacing: '0',
-                textAlign: 'left'
+                textAlign: 'left',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
               }}
             >
-              {link.name}
+              <span>{link.name}</span>
+              {link.highlight && (
+                <span style={{ fontSize: '10px', backgroundColor: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)', padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase' }}>
+                  NOVO
+                </span>
+              )}
             </Link>
           ))}
         </nav>

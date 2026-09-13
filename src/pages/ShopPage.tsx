@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     ShoppingBag, Star, Search, ShoppingCart,
     Tag, Zap, ShieldCheck, Package, ArrowRight,
-    Headphones
+    Headphones, ExternalLink
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
-    id: number;
+    id: number | string;
     title: string;
     category: string;
     price: string;
@@ -17,9 +18,40 @@ interface Product {
     description: string;
     accent: string;
     stock: number;
+    landingUrl?: string;
 }
 
+const DEFAULT_SHOP_PRODUCTS: Product[] = [
+    {
+        id: "prod-114-ideias",
+        title: "+114 Ideias Lucrativas de Renda Extra para Começar Hoje",
+        category: "Ebooks",
+        price: "15000 AKZ",
+        oldPrice: "30000 AKZ",
+        img: "/media/capa-114-ideias.jpg",
+        rating: 5.0,
+        description: "O arsenal de negócios disruptivos B2B e B2C de Luciano Bom-Ano que parecem ilegais de tão bons.",
+        accent: "#22c55e",
+        stock: 999,
+        landingUrl: "/livro-114-ideias"
+    },
+    {
+        id: "prod-mindset-disruptivo",
+        title: "Mindset Disruptivo: A Arte de Pensar Diferente",
+        category: "Liderança",
+        price: "18500 AKZ",
+        oldPrice: "25000 AKZ",
+        img: "/media/MINDSET BUSINESS.png",
+        rating: 4.9,
+        description: "Princípios práticos de mentalidade inabalável para empreendedores no mercado africano.",
+        accent: "#f83821",
+        stock: 50,
+        landingUrl: "/disruptivo"
+    }
+];
+
 const ShopPage: React.FC = () => {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [isMobile, setIsMobile] = useState(false);
     const [activeCategory, setActiveCategory] = useState('Todos');
@@ -31,9 +63,9 @@ const ShopPage: React.FC = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const categories = ['Todos', 'T-Shirts', 'Kits', 'Recursos', 'Ferramentas'];
+    const categories = ['Todos', 'Ebooks', 'T-Shirts', 'Kits', 'Recursos', 'Ferramentas'];
 
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<Product[]>(DEFAULT_SHOP_PRODUCTS);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -42,19 +74,22 @@ const ShopPage: React.FC = () => {
                 const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`);
                 if (response.ok) {
                     const data = await response.json();
-                    const formattedProducts = data.map((p: any) => ({
-                        id: p.id,
-                        title: p.title,
-                        category: p.category,
-                        price: `${p.price} AKZ`,
-                        oldPrice: p.oldPrice ? `${p.oldPrice} AKZ` : undefined,
-                        img: p.coverImage || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800",
-                        rating: 5.0,
-                        description: p.description,
-                        accent: "#0011fd",
-                        stock: 100
-                    }));
-                    setProducts(formattedProducts);
+                    if (Array.isArray(data) && data.length > 0) {
+                        const formattedProducts = data.map((p: any) => ({
+                            id: p.id,
+                            title: p.title,
+                            category: p.category || "Ebooks",
+                            price: `${p.price} AKZ`,
+                            oldPrice: p.oldPrice ? `${p.oldPrice} AKZ` : undefined,
+                            img: p.coverImage || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800",
+                            rating: p.rating || 5.0,
+                            description: p.description,
+                            accent: p.id === 'prod-114-ideias' ? '#22c55e' : '#0011fd',
+                            stock: p.stock || 100,
+                            landingUrl: p.landingUrl || (p.id === 'prod-114-ideias' ? '/livro-114-ideias' : undefined)
+                        }));
+                        setProducts(formattedProducts);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch products:", error);
@@ -209,8 +244,13 @@ const ShopPage: React.FC = () => {
                                         transition: 'all 0.4s ease',
                                         cursor: 'pointer'
                                     }}
+                                    onClick={() => {
+                                        if (product.landingUrl) {
+                                            navigate(product.landingUrl);
+                                        }
+                                    }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.borderColor = '#0011fd';
+                                        e.currentTarget.style.borderColor = product.accent || '#0011fd';
                                         e.currentTarget.style.transform = 'translateY(-10px)';
                                     }}
                                     onMouseLeave={(e) => {
@@ -248,7 +288,7 @@ const ShopPage: React.FC = () => {
                                             width: isMobile ? '40px' : '60px',
                                             height: isMobile ? '40px' : '60px',
                                             borderRadius: '50%',
-                                            backgroundColor: '#0011fd',
+                                            backgroundColor: product.accent || '#0011fd',
                                             border: 'none',
                                             color: '#fff',
                                             display: 'flex',
@@ -285,11 +325,26 @@ const ShopPage: React.FC = () => {
                                                     {product.oldPrice && <span style={{ fontSize: isMobile ? '12px' : '16px', color: '#444', textDecoration: 'line-through', fontWeight: 700 }}>{product.oldPrice}</span>}
                                                 </div>
                                             </div>
-                                            <div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: product.stock < 10 ? '#f83821' : '#00ff88', fontSize: '9px', fontWeight: 900, textTransform: 'uppercase' }}>
                                                     <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'currentColor' }}></div>
                                                     {product.stock} rest.
                                                 </div>
+
+                                                {product.landingUrl && (
+                                                    <span style={{
+                                                        fontSize: '11px',
+                                                        fontWeight: 900,
+                                                        color: product.accent || '#22c55e',
+                                                        textTransform: 'uppercase',
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px'
+                                                    }}>
+                                                        Ver Landing Page
+                                                        <ArrowRight size={13} />
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

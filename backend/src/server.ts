@@ -36,12 +36,19 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY || "YOUR_API_KEY" });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "YOUR_API_KEY" });
 
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: false
+}));
 
 const allowedOrigins = ['http://localhost:5173'];
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+        if (
+            !origin || 
+            allowedOrigins.includes(origin) || 
+            /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+            /\.vercel\.app$/.test(origin)
+        ) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -51,8 +58,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Proteção contra DoS de Payload (Reduzido de 100mb para 2mb)
-app.use(express.json({ limit: '2mb' }));
+// Proteção contra DoS de Payload
+app.use(express.json({ limit: '50mb' }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 1. Limite Global
 const globalLimiter = rateLimit({
@@ -331,12 +339,518 @@ app.get('/api/courses', async (req, res) => {
     }
 });
 
+const DEFAULT_PRODUCTS = [
+    {
+        "id": "prod-114-ideias",
+        "title": "+114 Ideias Lucrativas de Renda Extra para Começar Hoje",
+        "author": "Luciano Bom-Ano",
+        "description": "Edição Oficial Definitiva de 581 páginas. O maior arsenal de negócios disruptivos B2B e B2C do mercado angolano com planos de faturamento de 1 milhão de Kwanzas.",
+        "price": 15000,
+        "oldPrice": 30000,
+        "format": "DIGITAL",
+        "category": "Ebooks",
+        "coverImage": "/media/livros/+114 IDEIAS DE NEGÓCIO/114 IDEIAS BOOK.png",
+        "landingUrl": "/livro-114-ideias",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 581
+    },
+    {
+        "id": "prod-mindset-disruptivo",
+        "title": "Mindset Disruptivo: A Arte de Pensar Diferente",
+        "author": "Luciano Bom-Ano",
+        "description": "Princípios práticos de mentalidade inabalável para empreendedores que desejam romper barreiras no mercado africano.",
+        "price": 18500,
+        "oldPrice": 25000,
+        "format": "PHYSICAL",
+        "category": "Liderança & Mindset",
+        "coverImage": "/media/MINDSET BUSINESS.png",
+        "landingUrl": "/disruptivo",
+        "stock": 50,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 240
+    },
+    {
+        "id": "prod-faundr-blueprint",
+        "title": "Blueprint da Automação com Inteligência Artificial",
+        "author": "Equipa Bisnoteka",
+        "description": "Como implementar IA, agentes autônomos e automações de ponta a ponta na sua empresa ou consultoria.",
+        "price": 22000,
+        "oldPrice": 35000,
+        "format": "DIGITAL",
+        "category": "Estratégia & Negócios",
+        "coverImage": "/media/books.png",
+        "stock": 999,
+        "featured": false,
+        "rating": 5.0,
+        "pages": 180
+    },
+    {
+        "id": "prod-1m-business-plan",
+        "title": "1M: O Plano de Negócios de 1 Milhão",
+        "author": "Luciano Bom-Ano & Bisnoteka",
+        "description": "O roteiro estratégico direto ao ponto para desenhar, validar e apresentar um plano de negócios com potencial de atingir o primeiro milhão de Kwanzas.",
+        "price": 8500,
+        "oldPrice": 15000,
+        "format": "DIGITAL",
+        "category": "Estratégia & Negócios",
+        "coverImage": "/media/covers/cover_1m-business-plan.png",
+        "fileUrl": "/media/livros/outros livros/1M BUSINESS PLAN.pdf",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 12
+    },
+    {
+        "id": "prod-7-caracteristicas-empreendedor",
+        "title": "7 Características de um Empreendedor de Sucesso",
+        "author": "Luciano Bom-Ano",
+        "description": "Análise profunda dos padrões comportamentais, disciplina mental e hábitos diários que diferenciam os fundadores que prosperam em mercados desafiadores.",
+        "price": 7500,
+        "oldPrice": 14000,
+        "format": "DIGITAL",
+        "category": "Liderança & Mindset",
+        "coverImage": "/media/covers/cover_7-caracteristicas-empreendedor.png",
+        "fileUrl": "/media/livros/outros livros/7 CARACTERÍSTICAS DE UM EMPREENDEDOR DE SUCESSO.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 30
+    },
+    {
+        "id": "prod-melhor-forma-comecar-empreender",
+        "title": "A Melhor Forma de Começar a Empreender a Partir do Zero",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "A trilha de negócios lucrativos sem grande capital inicial. Validação rápida de ideias, captação de clientes iniciais e mitigação de riscos em Angola.",
+        "price": 9500,
+        "oldPrice": 18000,
+        "format": "DIGITAL",
+        "category": "Estratégia & Negócios",
+        "coverImage": "/media/covers/cover_melhor-forma-comecar-empreender.png",
+        "fileUrl": "/media/livros/outros livros/A MELHOR FORMA DE COMEÇAR A EMPREENDER.pdf",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 52
+    },
+    {
+        "id": "prod-apresentacao-geral-bisnoteka",
+        "title": "Bisnoteka: A Forja de Futuros Bilionários",
+        "author": "Bisnoteka",
+        "description": "Dossiê institucional e estratégico sobre a metodologia Bisnoteka, princípios de riqueza geracional, modelo educacional e formação executiva.",
+        "price": 6500,
+        "oldPrice": 12000,
+        "format": "DIGITAL",
+        "category": "Estratégia & Negócios",
+        "coverImage": "/media/covers/cover_apresentacao-geral-bisnoteka.png",
+        "fileUrl": "/media/livros/outros livros/APRESENTAÇÃO GERAL.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 51
+    },
+    {
+        "id": "prod-negocio-no-automatico",
+        "title": "Coloque Seu Negócio no Automático e Ganhe Enquanto Dormes",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Como estruturar processos operacionais, delegar tarefas críticas, usar ferramentas de automação e gerar fluxos previsíveis de receita sustentável.",
+        "price": 14000,
+        "oldPrice": 25000,
+        "format": "DIGITAL",
+        "category": "Estratégia & Negócios",
+        "coverImage": "/media/covers/cover_negocio-no-automatico.png",
+        "fileUrl": "/media/livros/outros livros/COLOQUE SEU NEGÓCIO NO AUTOMÁTICO E GANHE DINHEIRO ENQUANTO DORMES.pdf",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 92
+    },
+    {
+        "id": "prod-e-commerce-mastermind",
+        "title": "E-Commerce Mastermind: Criação, Gestão e Escala de Lojas Online",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Manual completo sobre seleção de produtos de alta procura, margens de lucro, gateways de pagamento e logística de entrega no comércio eletrónico angolano.",
+        "price": 11500,
+        "oldPrice": 22000,
+        "format": "DIGITAL",
+        "category": "Vendas & E-commerce",
+        "coverImage": "/media/covers/cover_e-commerce-mastermind.png",
+        "fileUrl": "/media/livros/outros livros/E-COMMERCE MASTERMIND.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 45
+    },
+    {
+        "id": "prod-email-marketing-mastermind",
+        "title": "E-mail Marketing Mastermind: Segredos de Alta Conversão",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Técnicas avançadas de redação de e-mails, títulos magnéticos, cadências de engajamento e funis automatizados que vendem 24 horas por dia.",
+        "price": 10500,
+        "oldPrice": 20000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_email-marketing-mastermind.png",
+        "fileUrl": "/media/livros/outros livros/E-MAIL MARKETING MASTERMIND.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 38
+    },
+    {
+        "id": "prod-email-marketing-estrategico",
+        "title": "E-mail Marketing Estratégico: Aumente e Gerencie Sua Base",
+        "author": "Bisnoteka & Bhao",
+        "description": "Estratégias práticas para construir listas de clientes proprietárias, evitar a dependência de redes sociais e monetizar a base com campanhas segmentadas.",
+        "price": 11000,
+        "oldPrice": 20000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_email-marketing-estrategico.png",
+        "fileUrl": "/media/livros/outros livros/E-MAIL MARKETING.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 62
+    },
+    {
+        "id": "prod-framework-inteligencia-competitiva",
+        "title": "Framework: Inteligência Competitiva de Mercado",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Metodologia estruturada para auditar concorrentes discretamente, analisar posicionamento, preços e estratégias para dominar o seu nicho.",
+        "price": 5500,
+        "oldPrice": 10000,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_framework-inteligencia-competitiva.png",
+        "fileUrl": "/media/livros/outros livros/FRAMEWORK INTEGÊNCIA COMPETITIVA.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 15
+    },
+    {
+        "id": "prod-framework-inteligencia-cliente",
+        "title": "Framework: Inteligência do Cliente e Gatilhos de Decisão",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Mapeamento comportamental detalhado do cliente ideal, identificando dores ocultas, objeções comuns e os estímulos emocionais que fecham contratos.",
+        "price": 5000,
+        "oldPrice": 9000,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_framework-inteligencia-cliente.png",
+        "fileUrl": "/media/livros/outros livros/FRAMEWORK INTEGÊNCIA DO CLIENTE.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 11
+    },
+    {
+        "id": "prod-framework-inteligencia-negocio",
+        "title": "Framework: Inteligência do Negócio e Painel de KPIs",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Matriz de indicadores de desempenho operacional, financeiro e comercial para manter o controle absoluto sobre o crescimento da sua empresa.",
+        "price": 5500,
+        "oldPrice": 10000,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_framework-inteligencia-negocio.png",
+        "fileUrl": "/media/livros/outros livros/FRAMEWORK INTEGÊNCIA DO NEGÓCIO.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 15
+    },
+    {
+        "id": "prod-guia-email-marketing",
+        "title": "Guia Prático do E-mail Marketing Direto",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Guia de implementação ágil para redigir propostas comerciais e comunicados objetivos que convertem leitores em clientes pagantes rapidamente.",
+        "price": 5000,
+        "oldPrice": 9500,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_guia-email-marketing.png",
+        "fileUrl": "/media/livros/outros livros/GUIA DO E-MAIL MARKETING.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 15
+    },
+    {
+        "id": "prod-guia-marketing-conteudo",
+        "title": "O Guia Definitivo do Marketing de Conteúdo",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Como estruturar uma esteira de publicações de alto valor que educa o público, estabelece autoridade incontestável e gera leads orgânicos consistentes.",
+        "price": 6500,
+        "oldPrice": 12000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_guia-marketing-conteudo.png",
+        "fileUrl": "/media/livros/outros livros/GUIA DO MARKETING DE CONTEÚDO.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 22
+    },
+    {
+        "id": "prod-guia-instagram-empreendedores",
+        "title": "O Guia Prático do Instagram para Empreendedores e Marcas",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Manual completo com mais de 100 páginas sobre posicionamento visual, roteiros de stories, reels de alcance e funis diretos para fechar vendas no Direct e WhatsApp.",
+        "price": 14500,
+        "oldPrice": 26000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_guia-instagram-empreendedores.png",
+        "fileUrl": "/media/livros/outros livros/GUIA PRÁTICO DO INSTAGRAM PARA EMPREENDEDORES E MARCAS.pdf",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 102
+    },
+    {
+        "id": "prod-high-ticket-vender-conhecimento",
+        "title": "High Ticket: Como Vender o Seu Conhecimento a Alto Preço",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "O método para empacotar serviços, consultorias e mentorias de 500.000 a 5.000.000 Kz, atraindo decisores corporativos dispostos a pagar pelo melhor.",
+        "price": 13500,
+        "oldPrice": 25000,
+        "format": "DIGITAL",
+        "category": "Vendas & E-commerce",
+        "coverImage": "/media/covers/cover_high-ticket-vender-conhecimento.png",
+        "fileUrl": "/media/livros/outros livros/HIGH TICKET.pdf",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 48
+    },
+    {
+        "id": "prod-jornada-valor-cliente",
+        "title": "Jornada de Valor do Cliente: Os 8 Estágios de Conversão",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Framework visual detalhando o passo a passo para transformar um visitante desconfiado num cliente de alta fidelidade e embaixador da sua marca.",
+        "price": 4500,
+        "oldPrice": 8000,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_jornada-valor-cliente.png",
+        "fileUrl": "/media/livros/outros livros/JORNADA DE VALOR DO CLIENTE.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 5
+    },
+    {
+        "id": "prod-checklist-crescimento-marketing",
+        "title": "Checklist: Crescimento com Marketing de Alta Performance",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Lista de verificação rápida para diagnosticar gargalos em campanhas de anúncios, páginas de vendas, criativos e taxas de conversão.",
+        "price": 4500,
+        "oldPrice": 8500,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_checklist-crescimento-marketing.png",
+        "fileUrl": "/media/livros/outros livros/LISTA DE VERIFICAÇÃO CRESCIMENTO COM MARKETING.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 8
+    },
+    {
+        "id": "prod-checklist-ecommerce-loja",
+        "title": "Checklist: Validação e Lançamento de E-Commerce",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Auditoria prática de prontidão com todos os itens mandatórios antes de inaugurar uma loja online: catálogo, estoque, segurança e suporte.",
+        "price": 4000,
+        "oldPrice": 7500,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_checklist-ecommerce-loja.png",
+        "fileUrl": "/media/livros/outros livros/LISTA DE VERIFICAÇÃO E-COMMERCE.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.7,
+        "pages": 5
+    },
+    {
+        "id": "prod-guia-lancamentos-produtos-servicos",
+        "title": "O Guia Prático de Lançamentos de Produtos e Serviços",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Como orquestrar campanhas de antecipação, gerar desejo reprimido e concentrar vendas maciças em datas de abertura oficiais no mercado nacional.",
+        "price": 12500,
+        "oldPrice": 24000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_guia-lancamentos-produtos-servicos.png",
+        "fileUrl": "/media/livros/outros livros/O GUIA PRÁTICO DE LANÇAMENTOS DE PRODUTOS E SERVIÇOS DE SUCESSO.pdf",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 59
+    },
+    {
+        "id": "prod-guia-facebook-empreendedores",
+        "title": "O Guia Prático do Facebook para Empreendedores e Marcas",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Como utilizar a maior rede social de Angola para construir comunidades engajadas, veicular anúncios com ROI positivo e gerar vendas locais contínuas.",
+        "price": 11500,
+        "oldPrice": 20000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_guia-facebook-empreendedores.png",
+        "fileUrl": "/media/livros/outros livros/O GUIA PRÁTICO DO FACEBOOK PARA EMPREENDEDORES E MARCAS.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 62
+    },
+    {
+        "id": "prod-guia-tiktok-empreendedores",
+        "title": "O Guia Prático do TikTok para Empreendedores e Marcas",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Domine o formato mais viral da internet atual. Roteiros de retenção, ganchos de 3 segundos e táticas para converter visualizações em clientes reais.",
+        "price": 12000,
+        "oldPrice": 22000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_guia-tiktok-empreendedores.png",
+        "fileUrl": "/media/livros/outros livros/O GUIA PRÁTICO DO TIKTOK PARA EMPREENDEDORES E MARCAS.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 75
+    },
+    {
+        "id": "prod-poder-do-trafego",
+        "title": "O Poder do Tráfego: Cresça o Seu Negócio",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "O guia de geração de tráfego para empresários que não querem depender de sorte. Multiplique as visitas e conversões qualificadas da sua empresa.",
+        "price": 11500,
+        "oldPrice": 21000,
+        "format": "DIGITAL",
+        "category": "Marketing",
+        "coverImage": "/media/covers/cover_poder-do-trafego.png",
+        "fileUrl": "/media/livros/outros livros/O PODER DO TRÁFEGO.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 61
+    },
+    {
+        "id": "prod-otimizacao-taxa-conversao-cro",
+        "title": "Otimização de Taxa de Conversão (CRO Prático)",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Como identificar pontos de atrito no seu funil de vendas, ajustar ofertas e fechar mais pedidos sem aumentar um único Kwanza em publicidade.",
+        "price": 5000,
+        "oldPrice": 9000,
+        "format": "DIGITAL",
+        "category": "Vendas & E-commerce",
+        "coverImage": "/media/covers/cover_otimizacao-taxa-conversao-cro.png",
+        "fileUrl": "/media/livros/outros livros/OTIMIZAÇÃO DE TAXA DE CONVERSÃO.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 8
+    },
+    {
+        "id": "prod-pmp-366-dias-frases",
+        "title": "PMP: 366 Dias e 366 Frases de Sabedoria & Liderança",
+        "author": "Bisnoteka & Luciano Bom-Ano",
+        "description": "Monumental compêndio de 383 páginas com lições diárias de Propósito, Motivação e Protagonismo para líderes, gestores e fundadores em Angola.",
+        "price": 18000,
+        "oldPrice": 32000,
+        "format": "DIGITAL",
+        "category": "Liderança & Mindset",
+        "coverImage": "/media/covers/cover_pmp-366-dias-frases.png",
+        "fileUrl": "/media/livros/outros livros/PMP-366 DIAS E 366 FRASES 01.pdf",
+        "stock": 999,
+        "featured": true,
+        "rating": 5.0,
+        "pages": 383
+    },
+    {
+        "id": "prod-questionario-integracao-cliente",
+        "title": "Questionário Estratégico de Onboarding de Cliente VIP",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Documento e protocolo formal para alinhar expectativas com clientes corporativos, levantar briefings precisos e causar uma primeira impressão de elite.",
+        "price": 4500,
+        "oldPrice": 8500,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_questionario-integracao-cliente.png",
+        "fileUrl": "/media/livros/outros livros/QUESTIONÁRIO DE INTEGRAÇÃO DE CLIENTE.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 10
+    },
+    {
+        "id": "prod-seo-masterboard",
+        "title": "SEO Masterboard: Domínio de Motores de Busca",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Manual técnico e estratégico de otimização para Google. Palavras-chave de intenção de compra, SEO local em Angola e geração contínua de tráfego orgânico.",
+        "price": 11000,
+        "oldPrice": 20000,
+        "format": "DIGITAL",
+        "category": "Estratégia & Negócios",
+        "coverImage": "/media/covers/cover_seo-masterboard.png",
+        "fileUrl": "/media/livros/outros livros/SEO MASTERBOARD.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 60
+    },
+    {
+        "id": "prod-templates-de-email-alta-resposta",
+        "title": "Pack de Templates de E-mail de Alta Resposta",
+        "author": "Bhao Creative & Bisnoteka",
+        "description": "Coleção de modelos prontos para copiar e colar: e-mails de boas-vindas, reativação de clientes inativos, propostas comerciais e recuperação de orçamentos.",
+        "price": 4500,
+        "oldPrice": 8000,
+        "format": "DIGITAL",
+        "category": "Checklists & Frameworks",
+        "coverImage": "/media/covers/cover_templates-de-email-alta-resposta.png",
+        "fileUrl": "/media/livros/outros livros/TEMPLATES DE E-MAIL.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.8,
+        "pages": 7
+    },
+    {
+        "id": "prod-terceirizacao-geracao-riqueza",
+        "title": "A Terceirização como Fator de Geração de Riqueza",
+        "author": "Luciano Bom-Ano & Bhao",
+        "description": "Como alavancar competências externas e profissionais especializados para reduzir custos fixos, aumentar a agilidade e focar no crescimento do negócio.",
+        "price": 12000,
+        "oldPrice": 22000,
+        "format": "DIGITAL",
+        "category": "Estratégia & Negócios",
+        "coverImage": "/media/covers/cover_terceirizacao-geracao-riqueza.png",
+        "fileUrl": "/media/livros/outros livros/TERCEIRIZAÇÃO DE NEGÓCIO COMO FATOR DE GERAÇÃO DE NEGÓCIO.pdf",
+        "stock": 999,
+        "featured": false,
+        "rating": 4.9,
+        "pages": 60
+    }
+];
+
 app.get('/api/products', async (req, res) => {
     try {
         const products = await prisma.product.findMany({ orderBy: { createdAt: 'desc' } });
-        res.json(products);
+        const existingIds = new Set((products || []).map((p: any) => p.id));
+        const combined: any[] = [...(products || [])];
+        for (const def of DEFAULT_PRODUCTS) {
+            if (!existingIds.has(def.id)) {
+                combined.push(def);
+            }
+        }
+        res.json(combined);
     } catch (error) {
-        console.error(error); res.status(500).json({ error: "Failed to fetch products." });
+        console.warn("Prisma error in /api/products, serving fallback products:", error);
+        res.json(DEFAULT_PRODUCTS);
     }
 });
 
@@ -591,6 +1105,263 @@ app.get('/api/mindset', async (req, res) => {
 });
 
 // ====================================================
+// COMMUNITY & JOBS API
+// ====================================================
+
+// 1. Get community posts
+app.get('/api/community/posts', authenticateToken, async (req: AuthRequest, res: express.Response) => {
+    try {
+        const userId = req.user?.id;
+        const posts = await prisma.communityPost.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        avatarUrl: true,
+                        subscriptionTier: true
+                    }
+                },
+                likes: true,
+                comments: {
+                    include: {
+                        user: {
+                            select: {
+                                name: true,
+                                avatarUrl: true,
+                                subscriptionTier: true
+                            }
+                        }
+                    },
+                    orderBy: { createdAt: 'asc' }
+                }
+            }
+        });
+
+        // Format posts to include like count, liked by user, comment count
+        const formattedPosts = posts.map(post => {
+            const hasLiked = userId ? post.likes.some(l => l.userId === userId) : false;
+            return {
+                id: post.id,
+                content: post.content,
+                category: post.category,
+                createdAt: post.createdAt,
+                user: post.user,
+                likesCount: post.likes.length,
+                likedByUser: hasLiked,
+                commentsCount: post.comments.length,
+                comments: post.comments
+            };
+        });
+
+        res.json(formattedPosts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao carregar publicações da comunidade." });
+    }
+});
+
+// 2. Create a community post
+app.post('/api/community/posts', authenticateToken, async (req: AuthRequest, res: express.Response) => {
+    try {
+        const userId = req.user?.id;
+        const { content, category } = req.body;
+
+        if (!userId) {
+            res.status(401).json({ error: "Utilizador não autenticado" });
+            return;
+        }
+
+        if (!content || content.trim() === '') {
+            res.status(400).json({ error: "O conteúdo da publicação não pode estar vazio" });
+            return;
+        }
+
+        const newPost = await prisma.communityPost.create({
+            data: {
+                userId,
+                content,
+                category: category || "GERAL"
+            },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        avatarUrl: true,
+                        subscriptionTier: true
+                    }
+                }
+            }
+        });
+
+        res.json({
+            ...newPost,
+            likesCount: 0,
+            likedByUser: false,
+            commentsCount: 0,
+            comments: []
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao criar publicação." });
+    }
+});
+
+// 3. Like/Unlike a post
+app.post('/api/community/posts/:id/like', authenticateToken, async (req: AuthRequest, res: express.Response) => {
+    try {
+        const userId = req.user?.id;
+        const postId = req.params.id as string;
+
+        if (!userId) {
+            res.status(401).json({ error: "Utilizador não autenticado" });
+            return;
+        }
+
+        const existingLike = await prisma.postLike.findUnique({
+            where: {
+                postId_userId: {
+                    postId,
+                    userId
+                }
+            }
+        });
+
+        if (existingLike) {
+            // Unlike
+            await prisma.postLike.delete({
+                where: {
+                    postId_userId: {
+                        postId,
+                        userId
+                    }
+                }
+            });
+            res.json({ liked: false });
+        } else {
+            // Like
+            await prisma.postLike.create({
+                data: {
+                    postId,
+                    userId
+                }
+            });
+            res.json({ liked: true });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao processar like." });
+    }
+});
+
+// 4. Create comment on a post
+app.post('/api/community/posts/:id/comments', authenticateToken, async (req: AuthRequest, res: express.Response) => {
+    try {
+        const userId = req.user?.id;
+        const postId = req.params.id as string;
+        const { content } = req.body;
+
+        if (!userId) {
+            res.status(401).json({ error: "Utilizador não autenticado" });
+            return;
+        }
+
+        if (!content || content.trim() === '') {
+            res.status(400).json({ error: "O comentário não pode estar vazio" });
+            return;
+        }
+
+        const comment = await prisma.postComment.create({
+            data: {
+                postId,
+                userId,
+                content
+            },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        avatarUrl: true,
+                        subscriptionTier: true
+                    }
+                }
+            }
+        });
+
+        res.json(comment);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao criar comentário." });
+    }
+});
+
+// 5. Get job opportunities
+app.get('/api/community/jobs', authenticateToken, async (req: express.Request, res: express.Response) => {
+    try {
+        const jobs = await prisma.jobOpportunity.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        avatarUrl: true
+                    }
+                }
+            }
+        });
+        res.json(jobs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao carregar vagas." });
+    }
+});
+
+// 6. Post a job opportunity
+app.post('/api/community/jobs', authenticateToken, async (req: AuthRequest, res: express.Response) => {
+    try {
+        const userId = req.user?.id;
+        const { title, company, location, type, salary, description, requirements, applyUrlOrEmail } = req.body;
+
+        if (!userId) {
+            res.status(401).json({ error: "Utilizador não autenticado" });
+            return;
+        }
+
+        if (!title || !company || !location || !type || !description || !applyUrlOrEmail) {
+            res.status(400).json({ error: "Campos obrigatórios em falta (título, empresa, localização, tipo, descrição, contacto)" });
+            return;
+        }
+
+        const newJob = await prisma.jobOpportunity.create({
+            data: {
+                userId,
+                title,
+                company,
+                location,
+                type,
+                salary: salary || null,
+                description,
+                requirements: requirements || null,
+                applyUrlOrEmail
+            },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        avatarUrl: true
+                    }
+                }
+            }
+        });
+
+        res.json(newJob);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao publicar vaga." });
+    }
+});
+
+// ====================================================
 // AUTHENTICATION & ONBOARDING API
 // ====================================================
 
@@ -715,11 +1486,68 @@ app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res: express
             role: user.role,
             subscriptionTier: user.subscriptionTier,
             onboardingCompleted: user.onboardingCompleted,
-            onboardingData: user.onboardingData
+            onboardingData: user.onboardingData,
+            avatarUrl: user.avatarUrl
         });
     } catch (error) {
         console.error("Auth me error:", error);
         res.status(500).json({ error: "Failed to fetch user profile" });
+    }
+});
+
+// 3b. Update Profile
+app.put('/api/auth/profile', authenticateToken, async (req: AuthRequest, res: express.Response): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const { name, email, password, avatarUrl } = req.body;
+
+        if (!name || !email) {
+            res.status(400).json({ error: "Name and email are required" });
+            return;
+        }
+
+        // Check if email is already taken by another user
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+        if (existingUser && existingUser.id !== req.user.id) {
+            res.status(400).json({ error: "Email is already registered by another user" });
+            return;
+        }
+
+        const updateData: any = {
+            name,
+            email,
+            avatarUrl: avatarUrl !== undefined ? avatarUrl : undefined
+        };
+
+        if (password && password.trim() !== '') {
+            updateData.passwordHash = await bcrypt.hash(password, 10);
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: req.user.id },
+            data: updateData
+        });
+
+        res.json({
+            success: true,
+            user: {
+                id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                subscriptionTier: updatedUser.subscriptionTier,
+                onboardingCompleted: updatedUser.onboardingCompleted,
+                onboardingData: updatedUser.onboardingData,
+                avatarUrl: updatedUser.avatarUrl
+            }
+        });
+    } catch (error) {
+        console.error("Update profile error:", error);
+        res.status(500).json({ error: "Failed to update profile" });
     }
 });
 
@@ -760,6 +1588,149 @@ app.post('/api/auth/onboarding', authenticateToken, async (req: AuthRequest, res
     } catch (error) {
         console.error("Onboarding submission error:", error);
         res.status(500).json({ error: "Failed to submit onboarding answers" });
+    }
+});
+
+// ====================================================
+// RESOURCES & FILES API (GERENCIAMENTO DE RECURSOS E DOWNLOADS)
+// ====================================================
+
+app.get('/api/resources', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { kind } = req.query;
+        const whereCondition = kind ? { resourceKind: String(kind) } : {};
+        const resources = await prisma.resource.findMany({
+            where: whereCondition,
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(resources);
+    } catch (error) {
+        console.error('GET /api/resources error:', error);
+        res.status(500).json({ error: "Failed to fetch resources" });
+    }
+});
+
+app.post('/api/resources/upload', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { fileName, fileData } = req.body;
+        if (!fileName || !fileData) {
+            res.status(400).json({ error: "fileName and fileData are required" });
+            return;
+        }
+
+        const uploadsDir = path.join(__dirname, '../uploads');
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        const ext = path.extname(fileName) || '.pdf';
+        const cleanName = path.basename(fileName, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+        const uniqueFileName = `${Date.now()}_${cleanName}${ext}`;
+        const filePath = path.join(uploadsDir, uniqueFileName);
+
+        const base64Data = fileData.replace(/^data:[^;]+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        fs.writeFileSync(filePath, buffer);
+
+        const sizeInMb = (buffer.length / (1024 * 1024)).toFixed(1);
+        const fileUrl = `/uploads/${uniqueFileName}`;
+
+        res.status(201).json({
+            fileUrl,
+            fileName: uniqueFileName,
+            extension: ext.replace('.', '').toUpperCase(),
+            size: `${sizeInMb} MB`
+        });
+    } catch (error: any) {
+        console.error('Upload resource error:', error);
+        res.status(500).json({ error: error.message || "Failed to upload file" });
+    }
+});
+
+app.post('/api/resources', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const {
+            title, description, category, resourceKind, extension, fileUrl,
+            content, size, accessType, coverImage, icon, externalUrl,
+            checklistItems, termExample
+        } = req.body;
+
+        if (!title || !category) {
+            res.status(400).json({ error: "title and category are required" });
+            return;
+        }
+
+        const newResource = await prisma.resource.create({
+            data: {
+                title,
+                description: description || '',
+                category,
+                resourceKind: resourceKind || 'FILE',
+                extension: extension ? extension.toUpperCase() : 'PDF',
+                fileUrl: fileUrl || null,
+                content: content || null,
+                size: size || '2.5 MB',
+                accessType: accessType || 'Freemium',
+                coverImage: coverImage || null,
+                icon: icon || null,
+                externalUrl: externalUrl || null,
+                checklistItems: checklistItems ? (typeof checklistItems === 'string' ? checklistItems : JSON.stringify(checklistItems)) : null,
+                termExample: termExample || null
+            }
+        });
+
+        res.status(201).json(newResource);
+    } catch (error: any) {
+        console.error('POST /api/resources error:', error);
+        res.status(500).json({ error: "Failed to create resource" });
+    }
+});
+
+app.put('/api/resources/:id', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const id = String(req.params.id);
+        const {
+            title, description, category, resourceKind, extension, fileUrl,
+            content, size, accessType, downloadsCount, coverImage, icon,
+            externalUrl, checklistItems, termExample
+        } = req.body;
+
+        const updatedResource = await prisma.resource.update({
+            where: { id },
+            data: {
+                title,
+                description,
+                category,
+                resourceKind,
+                extension: extension ? extension.toUpperCase() : undefined,
+                fileUrl,
+                content,
+                size,
+                accessType,
+                downloadsCount: downloadsCount !== undefined ? parseInt(downloadsCount) : undefined,
+                coverImage,
+                icon,
+                externalUrl,
+                checklistItems: checklistItems ? (typeof checklistItems === 'string' ? checklistItems : JSON.stringify(checklistItems)) : undefined,
+                termExample
+            }
+        });
+
+        res.json(updatedResource);
+    } catch (error: any) {
+        console.error('PUT /api/resources/:id error:', error);
+        res.status(500).json({ error: "Failed to update resource" });
+    }
+});
+
+app.delete('/api/resources/:id', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const id = String(req.params.id);
+        await prisma.resource.delete({ where: { id } });
+        res.json({ success: true, message: "Resource deleted successfully" });
+    } catch (error: any) {
+        console.error('DELETE /api/resources/:id error:', error);
+        res.status(500).json({ error: "Failed to delete resource" });
     }
 });
 

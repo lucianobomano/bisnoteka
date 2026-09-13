@@ -431,4 +431,110 @@ app.get('/api/mindset', async (req, res) => {
     }
 });
 
+// ====================================================
+// RESOURCES & FILES API
+// ====================================================
+
+app.get('/api/resources', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { kind } = req.query;
+        const whereCondition = kind ? { resourceKind: String(kind) } : {};
+        const resources = await prisma.resource.findMany({
+            where: whereCondition,
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(resources);
+    } catch (error) {
+        console.error('GET /api/resources error:', error);
+        res.status(500).json({ error: "Failed to fetch resources" });
+    }
+});
+
+app.post('/api/resources', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const {
+            title, description, category, resourceKind, extension, fileUrl,
+            content, size, accessType, coverImage, icon, externalUrl,
+            checklistItems, termExample
+        } = req.body;
+
+        if (!title || !category) {
+            res.status(400).json({ error: "title and category are required" });
+            return;
+        }
+
+        const newResource = await prisma.resource.create({
+            data: {
+                title,
+                description: description || '',
+                category,
+                resourceKind: resourceKind || 'FILE',
+                extension: extension ? extension.toUpperCase() : 'PDF',
+                fileUrl: fileUrl || null,
+                content: content || null,
+                size: size || '2.5 MB',
+                accessType: accessType || 'Freemium',
+                coverImage: coverImage || null,
+                icon: icon || null,
+                externalUrl: externalUrl || null,
+                checklistItems: checklistItems ? (typeof checklistItems === 'string' ? checklistItems : JSON.stringify(checklistItems)) : null,
+                termExample: termExample || null
+            }
+        });
+
+        res.status(201).json(newResource);
+    } catch (error: any) {
+        console.error('POST /api/resources error:', error);
+        res.status(500).json({ error: "Failed to create resource" });
+    }
+});
+
+app.put('/api/resources/:id', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const {
+            title, description, category, resourceKind, extension, fileUrl,
+            content, size, accessType, downloadsCount, coverImage, icon,
+            externalUrl, checklistItems, termExample
+        } = req.body;
+
+        const updatedResource = await prisma.resource.update({
+            where: { id },
+            data: {
+                title,
+                description,
+                category,
+                resourceKind,
+                extension: extension ? extension.toUpperCase() : undefined,
+                fileUrl,
+                content,
+                size,
+                accessType,
+                downloadsCount: downloadsCount !== undefined ? parseInt(downloadsCount) : undefined,
+                coverImage,
+                icon,
+                externalUrl,
+                checklistItems: checklistItems ? (typeof checklistItems === 'string' ? checklistItems : JSON.stringify(checklistItems)) : undefined,
+                termExample
+            }
+        });
+
+        res.json(updatedResource);
+    } catch (error: any) {
+        console.error('PUT /api/resources/:id error:', error);
+        res.status(500).json({ error: "Failed to update resource" });
+    }
+});
+
+app.delete('/api/resources/:id', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        await prisma.resource.delete({ where: { id } });
+        res.json({ success: true, message: "Resource deleted successfully" });
+    } catch (error: any) {
+        console.error('DELETE /api/resources/:id error:', error);
+        res.status(500).json({ error: "Failed to delete resource" });
+    }
+});
+
 export default app;

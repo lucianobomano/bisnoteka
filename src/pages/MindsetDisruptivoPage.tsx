@@ -56,7 +56,7 @@ const MindsetDisruptivoPage: React.FC = () => {
         author: activeTrack?.bookAuthor || "Gary Keller & Jay Papasan",
         description: activeTrack?.description || "A focada busca por resultados extraordinários.",
         cover: activeTrack?.coverImage || "/media/LIVROS01.png",
-        month: activeTrack ? new Date(activeTrack.monthYear).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) : "Março 2024",
+        month: activeTrack && (activeTrack.monthYear || activeTrack.createdAt) ? new Date(activeTrack.monthYear || activeTrack.createdAt).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) : "Junho de 2026",
         totalDays: 31,
         currentDay: 12,
         progress: 42,
@@ -76,7 +76,7 @@ const MindsetDisruptivoPage: React.FC = () => {
     ];
 
     const pastChallenges = tracks.slice(1).map((t: any) => ({
-        month: new Date(t.monthYear).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
+        month: (t.monthYear || t.createdAt) ? new Date(t.monthYear || t.createdAt).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) : "Junho de 2026",
         title: t.bookTitle,
         cover: t.coverImage || "/media/LIVROS01.png",
         status: t.status,

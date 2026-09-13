@@ -15,6 +15,9 @@ import MindsetDisruptivoPage from './pages/MindsetDisruptivoPage';
 import BisnotekaPage from './pages/BisnotekaPage';
 import IdeaDetailsPage from './pages/IdeaDetailsPage';
 import FaundrMagazineLandingPage from './pages/FaundrMagazineLandingPage';
+import Book114IdeiasLandingPage from './pages/Book114IdeiasLandingPage';
+import ResourcesPage from './pages/ResourcesPage';
+import OpportunitiesPage from './pages/OpportunitiesPage';
 import AdminDashboard from './pages/AdminDashboard';
 import CourseDetailsPage from './pages/CourseDetailsPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -24,9 +27,12 @@ import MembersCoursePlayerPage from './pages/MembersCoursePlayerPage';
 import BusinessOnboardingPage from './pages/BusinessOnboardingPage';
 import MagazineReaderPage from './pages/MagazineReaderPage';
 import BusinessDetailsPage from './pages/BusinessDetailsPage';
+import ProfilePage from './pages/ProfilePage';
+import CommunityPage from './pages/CommunityPage';
 
 // Auth Imports
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OnboardingPage from './pages/OnboardingPage';
@@ -113,16 +119,19 @@ const AppContent: React.FC = () => {
   const isMembersPage = location.pathname.startsWith('/membros');
   const isReaderPage = location.pathname.startsWith('/ler-revista');
   const isAuthPage = ['/login', '/cadastro', '/onboarding'].includes(location.pathname);
+  const isEbook114Landing = location.pathname.startsWith('/livro-114-ideias') || location.pathname.startsWith('/livros/114-ideias');
   const hideHeaderFooter = isAdminPage || isMembersPage || isReaderPage || isAuthPage;
  
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ minHeight: '100vh', backgroundColor: isEbook114Landing ? '#060b08' : '#ffffff' }}>
       {!hideHeaderFooter && <Header />}
       <main>
         <Routes>
           {/* Public Landing Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/livros" element={<Books />} />
+          <Route path="/livro-114-ideias" element={<Book114IdeiasLandingPage />} />
+          <Route path="/livros/114-ideias" element={<Book114IdeiasLandingPage />} />
           <Route path="/sucesso" element={<SuccessStoriesPage />} />
           <Route path="/revista" element={<MagazinePage />} />
           <Route path="/ler-revista/:id" element={<MagazineReaderPage />} />
@@ -134,6 +143,10 @@ const AppContent: React.FC = () => {
           <Route path="/forge" element={<FaundrForgePage />} />
           <Route path="/experience" element={<FaundrExperiencePage />} />
           <Route path="/disruptivo" element={<MindsetDisruptivoPage />} />
+          <Route path="/bisnoteka" element={<BisnotekaPage />} />
+          <Route path="/bisnoteka/:id" element={<IdeaDetailsPage />} />
+          <Route path="/recursos" element={<ResourcesPage />} />
+          <Route path="/oportunidades" element={<OpportunitiesPage />} />
           
           {/* Authentication & User Onboarding */}
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
@@ -142,8 +155,6 @@ const AppContent: React.FC = () => {
 
           {/* Protected Business Generator Tool */}
           <Route path="/criar-negocio" element={<ProtectedRoute><BusinessOnboardingPage /></ProtectedRoute>} />
-          <Route path="/bisnoteka" element={<ProtectedRoute><BisnotekaPage /></ProtectedRoute>} />
-          <Route path="/bisnoteka/:id" element={<ProtectedRoute><IdeaDetailsPage /></ProtectedRoute>} />
           
           {/* Admin area (could also be protected by a role guard) */}
           <Route path="/admin" element={<AdminDashboard />} />
@@ -156,6 +167,8 @@ const AppContent: React.FC = () => {
             <Route index element={<MembersDashboardPage />} />
             <Route path="curso/:id" element={<MembersCoursePlayerPage />} />
             <Route path="negocio/:id" element={<BusinessDetailsPage />} />
+            <Route path="perfil" element={<ProfilePage />} />
+            <Route path="comunidade" element={<CommunityPage />} />
           </Route>
         </Routes>
       </main>
@@ -167,10 +180,12 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      <AuthProvider>
-        <ScrollToTop />
-        <AppContent />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ScrollToTop />
+          <AppContent />
+        </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }

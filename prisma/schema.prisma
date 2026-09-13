@@ -33,6 +33,10 @@ model User {
   orders               Order[]
   forgeApplications    ForgeApplication[]
   eventTickets         EventTicket[]
+  communityPosts       CommunityPost[]
+  postLikes            PostLike[]
+  postComments         PostComment[]
+  jobOpportunities     JobOpportunity[]
 }
 
 enum Role {
@@ -313,20 +317,24 @@ model DailyQuote {
 }
 
 model Resource {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  type        ResourceType
-  fileUrl     String
-  category    String
-  createdAt   DateTime @default(now())
-}
-
-enum ResourceType {
-  PDF
-  TEMPLATE
-  SPREADSHEET
-  TOOL
+  id             String   @id @default(uuid())
+  title          String
+  description    String
+  category       String
+  resourceKind   String   @default("FILE") // FILE, DICTIONARY, CHECKLIST, TOOL
+  extension      String   @default("PDF") // PDF, CSV, DOCX, ZIP, TXT
+  fileUrl        String?
+  content        String?
+  size           String   @default("2.5 MB")
+  accessType     String   @default("Freemium") // Freemium, Premium
+  downloadsCount Int      @default(0)
+  coverImage     String?
+  icon           String?
+  externalUrl    String?
+  checklistItems String?
+  termExample    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt @default(now())
 }
 
 // ==========================================
@@ -347,3 +355,58 @@ model Business {
 
   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+// ==========================================
+// 8. COMUNIDADE & OPORTUNIDADES
+// ==========================================
+
+model CommunityPost {
+  id        String   @id @default(uuid())
+  userId    String
+  content   String
+  category  String   @default("GERAL") // GERAL, IDEIAS, MARKETING, ESTRATEGIA
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     PostLike[]
+  comments  PostComment[]
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([postId, userId])
+}
+
+model PostComment {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model JobOpportunity {
+  id              String   @id @default(uuid())
+  userId          String
+  title           String
+  company         String
+  location        String
+  type            String   // FULL_TIME, PART_TIME, REMOTE, FREELANCE
+  salary          String?
+  description     String
+  requirements    String?
+  applyUrlOrEmail String
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+

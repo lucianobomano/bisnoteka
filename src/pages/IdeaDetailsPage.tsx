@@ -114,13 +114,13 @@ const IdeaDetailsPage: React.FC = () => {
             </div>
 
             {/* Hero Section */}
-            <section style={{ padding: isMobile ? '120px 20px 60px' : '150px 60px 80px', backgroundColor: '#f6f7f9' }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '60px', alignItems: 'center' }}>
+            <section style={{ padding: isMobile ? '120px 20px 60px' : '150px 60px 80px', backgroundColor: '#f6f7f9', textAlign: 'center' }}>
+                <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
                     <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        style={{ flex: 1 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
                     >
                         <div style={{
                             display: 'inline-block',
@@ -142,18 +142,19 @@ const IdeaDetailsPage: React.FC = () => {
                             letterSpacing: '-3px',
                             textTransform: 'uppercase',
                             marginBottom: '30px',
-                            color: '#10171f'
+                            color: '#10171f',
+                            textAlign: 'center'
                         }}>{idea.title}</h1>
-                        <p style={{ fontSize: '20px', color: '#555', marginBottom: '40px', lineHeight: 1.5, fontWeight: 500 }}>
+                        <p style={{ fontSize: '20px', color: '#555', marginBottom: '40px', lineHeight: 1.5, fontWeight: 500, maxWidth: '700px', textAlign: 'center' }}>
                             {idea.description}
                         </p>
 
-                        <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#eef1ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <DollarSign size={20} color="#0011fd" />
                                 </div>
-                                <div>
+                                <div style={{ textAlign: 'left' }}>
                                     <p style={{ fontSize: '10px', color: '#999', fontWeight: 800, textTransform: 'uppercase' }}>Investimento</p>
                                     <p style={{ fontSize: '14px', fontWeight: 900 }}>{idea.investment}</p>
                                 </div>
@@ -162,7 +163,7 @@ const IdeaDetailsPage: React.FC = () => {
                                 <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#fff0ef', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <TrendingUp size={20} color="#f83821" />
                                 </div>
-                                <div>
+                                <div style={{ textAlign: 'left' }}>
                                     <p style={{ fontSize: '10px', color: '#999', fontWeight: 800, textTransform: 'uppercase' }}>Potencial</p>
                                     <p style={{ fontSize: '14px', fontWeight: 900 }}>{idea.potential}</p>
                                 </div>
@@ -171,28 +172,11 @@ const IdeaDetailsPage: React.FC = () => {
                                 <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#f0fff4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Zap size={20} color="#00c853" />
                                 </div>
-                                <div>
+                                <div style={{ textAlign: 'left' }}>
                                     <p style={{ fontSize: '10px', color: '#999', fontWeight: 800, textTransform: 'uppercase' }}>Dificuldade</p>
                                     <p style={{ fontSize: '14px', fontWeight: 900 }}>{idea.difficulty}</p>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        style={{ flex: 1, width: '100%' }}
-                    >
-                        <div style={{
-                            width: '100%',
-                            aspectRatio: '16/10',
-                            borderRadius: '40px',
-                            overflow: 'hidden',
-                            boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
-                            position: 'relative'
-                        }}>
-                            <img src={idea.img} alt={idea.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
                     </motion.div>
                 </div>
@@ -313,7 +297,7 @@ const IdeaDetailsPage: React.FC = () => {
                                                     <div style={{
                                                         padding: '30px',
                                                         backgroundColor: '#ffffff',
-                                                        borderRadius: '28px',
+                                                        borderRadius: '12px',
                                                         border: '1px solid #f0f0f0',
                                                         boxShadow: '0 10px 30px rgba(0,0,0,0.03)',
                                                         display: 'flex',
@@ -334,7 +318,7 @@ const IdeaDetailsPage: React.FC = () => {
                                                             width: '56px',
                                                             height: '56px',
                                                             minWidth: '56px',
-                                                            borderRadius: '18px',
+                                                            borderRadius: '12px',
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
@@ -387,7 +371,7 @@ const IdeaDetailsPage: React.FC = () => {
                                     ].map((file, i) => (
                                         <div key={i} style={{
                                             padding: '25px',
-                                            borderRadius: '20px',
+                                            borderRadius: '12px',
                                             border: '1px solid #f0f0f0',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -421,7 +405,7 @@ const IdeaDetailsPage: React.FC = () => {
                                 <h2 style={{ fontSize: '36px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '40px' }}>Ativos Visuais</h2>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                                     {[1, 2, 3, 4].map((n) => (
-                                        <div key={n} style={{ width: '100%', height: '300px', backgroundColor: '#f0f0f0', borderRadius: '24px', overflow: 'hidden' }}>
+                                        <div key={n} style={{ width: '100%', height: '300px', backgroundColor: '#f0f0f0', borderRadius: '12px', overflow: 'hidden' }}>
                                             <img src={`https://images.unsplash.com/photo-${1500000000000 + n}?q=80&w=1200&auto=format&fit=crop`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Gallery" />
                                         </div>
                                     ))}
@@ -435,7 +419,7 @@ const IdeaDetailsPage: React.FC = () => {
                                 animate={{ opacity: 1, y: 0 }}
                             >
                                 <h2 style={{ fontSize: '36px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '15px' }}>Feedback da Comunidade</h2>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '30px', marginBottom: '50px', padding: '40px', backgroundColor: '#f6f7f9', borderRadius: '32px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '30px', marginBottom: '50px', padding: '40px', backgroundColor: '#f6f7f9', borderRadius: '12px' }}>
                                     <div style={{ textAlign: 'center' }}>
                                         <div style={{ fontSize: '64px', fontWeight: 900, color: '#10171f', lineHeight: 1 }}>4.9</div>
                                         <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', marginTop: '10px' }}>
@@ -460,7 +444,7 @@ const IdeaDetailsPage: React.FC = () => {
 
                     {/* Sidebar */}
                     <div>
-                        <div style={{ backgroundColor: '#10171f', padding: '40px', borderRadius: '32px', color: '#fff', position: 'sticky', top: '150px' }}>
+                        <div style={{ backgroundColor: '#10171f', padding: '40px', borderRadius: '12px', color: '#fff', position: 'sticky', top: '150px' }}>
                             <h3 style={{ fontSize: '24px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '15px' }}>Monetização</h3>
                             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 {idea.monetization.map((m: string, i: number) => (
@@ -486,7 +470,7 @@ const IdeaDetailsPage: React.FC = () => {
                                 padding: '20px',
                                 backgroundColor: '#f83821',
                                 color: '#fff',
-                                borderRadius: '16px',
+                                borderRadius: '12px',
                                 border: 'none',
                                 fontSize: '16px',
                                 fontWeight: 900,

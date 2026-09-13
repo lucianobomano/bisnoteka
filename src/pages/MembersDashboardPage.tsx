@@ -64,26 +64,49 @@ const MembersDashboardPage: React.FC = () => {
         }
     }, [token]);
 
+    const getHoursStudied = () => {
+        const totalMinutes = myCourses.reduce((acc, course) => {
+            const durationStr = course.duration || '';
+            let minutes = 0;
+            const hMatch = durationStr.match(/(\d+)\s*h/i);
+            const mMatch = durationStr.match(/(\d+)\s*m/i);
+            if (hMatch) minutes += parseInt(hMatch[1]) * 60;
+            if (mMatch) minutes += parseInt(mMatch[1]);
+            if (!hMatch && !mMatch) {
+                const numMatch = durationStr.match(/(\d+)/);
+                if (numMatch) minutes += parseInt(numMatch[1]) * 60;
+            }
+            return acc + Math.round((course.progress / 100) * minutes);
+        }, 0);
+
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        return `${hours}h ${mins}m`;
+    };
+
+    const activeCoursesCount = myCourses.length;
+    const certificatesCount = myCourses.filter(c => c.progress === 100).length;
+
     return (
         <div style={{ paddingBottom: '2rem' }}>
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
                 <div>
-                    <h1 style={{ fontSize: '2.25rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '-0.025em', color: '#fff' }}>
+                    <h1 style={{ fontSize: '2.25rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '-0.025em', color: 'var(--text-color)' }}>
                         Bem-vindo{user ? `, ${user.name.split(' ')[0]}` : ' de volta'}!
                     </h1>
-                    <p style={{ color: '#aaaaaa', fontSize: '1.125rem' }}>O seu painel central de evolução e negócios.</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.125rem' }}>O seu painel central de evolução e negócios.</p>
                 </div>
 
                 {/* Tab Navigation */}
-                <div style={{ display: 'flex', backgroundColor: '#111', padding: '6px', borderRadius: '16px', border: '1px solid #222' }}>
+                <div style={{ display: 'flex', backgroundColor: 'var(--card-bg)', padding: '6px', borderRadius: '16px', border: '1px solid var(--card-border)' }}>
                     <button
                         onClick={() => setActiveTab('cursos')}
                         style={{
                             padding: '12px 24px',
                             borderRadius: '12px',
                             border: 'none',
-                            backgroundColor: activeTab === 'cursos' ? '#222' : 'transparent',
-                            color: activeTab === 'cursos' ? '#fff' : '#888',
+                            backgroundColor: activeTab === 'cursos' ? 'var(--sidebar-bg)' : 'transparent',
+                            color: activeTab === 'cursos' ? 'var(--text-color)' : 'var(--text-muted)',
                             fontSize: '14px',
                             fontWeight: 800,
                             cursor: 'pointer',
@@ -93,7 +116,7 @@ const MembersDashboardPage: React.FC = () => {
                             transition: 'all 0.2s'
                         }}
                     >
-                        <GraduationCap size={18} color={activeTab === 'cursos' ? '#f83821' : '#888'} /> O Meu Aprendizado
+                        <GraduationCap size={18} color={activeTab === 'cursos' ? '#f83821' : 'var(--text-muted)'} /> O Meu Aprendizado
                     </button>
                     <button
                         onClick={() => setActiveTab('negocios')}
@@ -101,8 +124,8 @@ const MembersDashboardPage: React.FC = () => {
                             padding: '12px 24px',
                             borderRadius: '12px',
                             border: 'none',
-                            backgroundColor: activeTab === 'negocios' ? '#222' : 'transparent',
-                            color: activeTab === 'negocios' ? '#fff' : '#888',
+                            backgroundColor: activeTab === 'negocios' ? 'var(--sidebar-bg)' : 'transparent',
+                            color: activeTab === 'negocios' ? 'var(--text-color)' : 'var(--text-muted)',
                             fontSize: '14px',
                             fontWeight: 800,
                             cursor: 'pointer',
@@ -112,7 +135,7 @@ const MembersDashboardPage: React.FC = () => {
                             transition: 'all 0.2s'
                         }}
                     >
-                        <Briefcase size={18} color={activeTab === 'negocios' ? '#f83821' : '#888'} /> Os Meus Negócios
+                        <Briefcase size={18} color={activeTab === 'negocios' ? '#f83821' : 'var(--text-muted)'} /> Os Meus Negócios
                     </button>
                 </div>
             </div>
@@ -127,8 +150,10 @@ const MembersDashboardPage: React.FC = () => {
                                     <PlayCircle color="#0011fd" size={28} />
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '1.875rem', fontWeight: 900, color: '#fff', lineHeight: 1, marginBottom: '4px' }}>2</div>
-                                    <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Cursos Ativos</div>
+                                    <div style={{ fontSize: '1.875rem', fontWeight: 900, color: 'var(--text-color)', lineHeight: 1, marginBottom: '4px' }}>
+                                        {isCoursesLoading ? '...' : activeCoursesCount}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Cursos Ativos</div>
                                 </div>
                             </div>
                             <div className="members-stat-card" style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -136,8 +161,10 @@ const MembersDashboardPage: React.FC = () => {
                                     <Clock color="#f83821" size={28} />
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '1.875rem', fontWeight: 900, color: '#fff', lineHeight: 1, marginBottom: '4px' }}>12h 45m</div>
-                                    <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Horas Estudadas</div>
+                                    <div style={{ fontSize: '1.875rem', fontWeight: 900, color: 'var(--text-color)', lineHeight: 1, marginBottom: '4px' }}>
+                                        {isCoursesLoading ? '...' : getHoursStudied()}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Horas Estudadas</div>
                                 </div>
                             </div>
                             <div className="members-stat-card" style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -145,15 +172,17 @@ const MembersDashboardPage: React.FC = () => {
                                     <Trophy color="#eab308" size={28} />
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '1.875rem', fontWeight: 900, color: '#fff', lineHeight: 1, marginBottom: '4px' }}>0</div>
-                                    <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Certificados</div>
+                                    <div style={{ fontSize: '1.875rem', fontWeight: 900, color: 'var(--text-color)', lineHeight: 1, marginBottom: '4px' }}>
+                                        {isCoursesLoading ? '...' : certificatesCount}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Certificados</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* My Courses */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', marginTop: '2rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.025em', color: '#fff' }}>Cursos em Andamento</h2>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.025em', color: 'var(--text-color)' }}>Cursos em Andamento</h2>
                         </div>
                         
                         <div className="course-grid">
@@ -166,7 +195,7 @@ const MembersDashboardPage: React.FC = () => {
                                     whileHover={{ y: -10 }}
                                     style={{
                                         width: '100%',
-                                        backgroundColor: '#111111',
+                                        backgroundColor: 'var(--card-bg)',
                                         backdropFilter: 'blur(10px)',
                                         WebkitBackdropFilter: 'blur(10px)',
                                         borderRadius: '24px',
@@ -175,8 +204,8 @@ const MembersDashboardPage: React.FC = () => {
                                         flexDirection: 'column',
                                         position: 'relative',
                                         overflow: 'hidden',
-                                        border: '1px solid #222',
-                                        boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+                                        border: '1px solid var(--card-border)',
+                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
                                     }}
                                 >
                                     {/* Category Badge */}
@@ -224,7 +253,7 @@ const MembersDashboardPage: React.FC = () => {
                                     <h3 style={{
                                         fontSize: '22px',
                                         fontWeight: 900,
-                                        color: '#ffffff',
+                                        color: 'var(--text-color)',
                                         marginBottom: '5px',
                                         textTransform: 'uppercase',
                                         lineHeight: 1.1
@@ -233,7 +262,7 @@ const MembersDashboardPage: React.FC = () => {
                                     </h3>
                                     <p style={{
                                         fontSize: '12px',
-                                        color: '#aaaaaa',
+                                        color: 'var(--text-muted)',
                                         marginBottom: '10px',
                                         display: '-webkit-box',
                                         WebkitLineClamp: 3,
@@ -244,7 +273,7 @@ const MembersDashboardPage: React.FC = () => {
                                     }}>
                                         {course.description}
                                     </p>
-                                    <p style={{ fontSize: '12px', color: '#ffffff', fontWeight: 'bold', marginBottom: '15px' }}>
+                                    <p style={{ fontSize: '12px', color: 'var(--text-color)', fontWeight: 'bold', marginBottom: '15px' }}>
                                         {course.instructor}
                                     </p>
 
@@ -258,7 +287,7 @@ const MembersDashboardPage: React.FC = () => {
                                                 color="#f83821"
                                             />
                                         ))}
-                                        <span style={{ fontSize: '12px', fontWeight: 700, marginLeft: '5px', color: '#ffffff' }}>
+                                        <span style={{ fontSize: '12px', fontWeight: 700, marginLeft: '5px', color: 'var(--text-color)' }}>
                                             {course.rating.toFixed(1)}
                                         </span>
                                     </div>
@@ -266,10 +295,10 @@ const MembersDashboardPage: React.FC = () => {
                                     {/* Progress Section */}
                                     <div style={{ marginTop: 'auto' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
-                                            <span style={{ fontSize: '10px', fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Progresso</span>
-                                            <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff' }}>{course.progress}%</span>
+                                            <span style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Progresso</span>
+                                            <span style={{ fontSize: '12px', fontWeight: 900, color: 'var(--text-color)' }}>{course.progress}%</span>
                                         </div>
-                                        <div className="progress-bar-bg" style={{ marginBottom: '20px', height: '8px', backgroundColor: '#222', borderRadius: '5px', overflow: 'hidden' }}>
+                                        <div className="progress-bar-bg" style={{ marginBottom: '20px', height: '8px', backgroundColor: 'var(--card-border)', borderRadius: '5px', overflow: 'hidden' }}>
                                             <div className="progress-bar-fill" style={{ width: `${course.progress}%`, backgroundColor: '#f83821', height: '100%', borderRadius: '5px', transition: 'width 0.5s ease' }}></div>
                                         </div>
                                         
@@ -277,8 +306,8 @@ const MembersDashboardPage: React.FC = () => {
                                             <button style={{ 
                                                 width: '100%', 
                                                 height: '54px', 
-                                                backgroundColor: '#ffffff', 
-                                                color: '#10171f', 
+                                                backgroundColor: 'var(--text-color)', 
+                                                color: 'var(--bg-color)', 
                                                 borderRadius: '12px', 
                                                 fontWeight: 900, 
                                                 textTransform: 'uppercase', 
@@ -292,7 +321,7 @@ const MembersDashboardPage: React.FC = () => {
                                                 border: 'none'
                                             }}
                                                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f83821'; e.currentTarget.style.color = '#fff'; }}
-                                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#10171f'; }}
+                                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--text-color)'; e.currentTarget.style.color = 'var(--bg-color)'; }}
                                             >
                                                 Continuar a Aula <Play size={16} fill="currentColor" />
                                             </button>
@@ -307,7 +336,7 @@ const MembersDashboardPage: React.FC = () => {
                 {activeTab === 'negocios' && (
                     <motion.div key="negocios" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', marginTop: '1rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.025em', color: '#fff' }}>Negócios Gerados</h2>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.025em', color: 'var(--text-color)' }}>Negócios Gerados</h2>
                             <Link to="/criar-negocio" style={{ textDecoration: 'none' }}>
                                 <button style={{ padding: '12px 24px', backgroundColor: '#f83821', color: '#fff', border: 'none', borderRadius: '99px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <Wand2 size={16} /> CRIAR NOVO NEGÓCIO
@@ -317,9 +346,9 @@ const MembersDashboardPage: React.FC = () => {
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
                             {isLoading ? (
-                                <p style={{ color: '#888' }}>A carregar os seus negócios...</p>
+                                <p style={{ color: 'var(--text-muted)' }}>A carregar os seus negócios...</p>
                             ) : realBusinesses.length === 0 ? (
-                                <p style={{ color: '#888' }}>Ainda não gerou nenhum negócio. Clique em "Criar Novo Negócio" para começar.</p>
+                                <p style={{ color: 'var(--text-muted)' }}>Ainda não gerou nenhum negócio. Clique em "Criar Novo Negócio" para começar.</p>
                             ) : (
                                 realBusinesses.map((biz) => {
                                     const primaryColor = biz.colorPalette?.custom?.[0] || '#f83821';
@@ -328,8 +357,8 @@ const MembersDashboardPage: React.FC = () => {
                                             key={biz.id}
                                             whileHover={{ y: -5, borderColor: '#444' }}
                                             style={{
-                                                backgroundColor: '#111',
-                                                border: '1px solid #222',
+                                                backgroundColor: 'var(--card-bg)',
+                                                border: '1px solid var(--card-border)',
                                                 borderRadius: '20px',
                                                 padding: '24px',
                                                 display: 'flex',
@@ -344,8 +373,8 @@ const MembersDashboardPage: React.FC = () => {
                                             
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                                 <div>
-                                                    <h3 style={{ fontSize: '24px', fontWeight: 900, color: '#fff', marginBottom: '4px', letterSpacing: '-0.5px' }}>{biz.name}</h3>
-                                                    <p style={{ color: '#666', fontSize: '12px', fontWeight: 600 }}>Criado em {new Date(biz.createdAt).toLocaleDateString('pt-PT')}</p>
+                                                    <h3 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-color)', marginBottom: '4px', letterSpacing: '-0.5px' }}>{biz.name}</h3>
+                                                    <p style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600 }}>Criado em {new Date(biz.createdAt).toLocaleDateString('pt-PT')}</p>
                                                 </div>
                                                 <div style={{ 
                                                     backgroundColor: biz.status === 'Gerado pela IA' ? 'rgba(0, 200, 83, 0.1)' : 'rgba(234, 179, 8, 0.1)',
@@ -358,26 +387,24 @@ const MembersDashboardPage: React.FC = () => {
                                                 }}>
                                                     {biz.status}
                                                 </div>
-                                            </div>
-
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                                                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                                 {biz.niche && biz.niche.map(n => (
-                                                    <span key={n} style={{ backgroundColor: '#222', color: '#ccc', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 600 }}>
-                                                        {n}
-                                                    </span>
+                                                    <span key={n} style={{ backgroundColor: 'var(--sidebar-bg)', color: 'var(--text-color)', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 600 }}>
+                                                         {n}
+                                                     </span>
                                                 ))}
                                             </div>
 
-                                            <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ color: '#555', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' }}>Estilo Visual</span>
-                                                    <span style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{biz.visualStyle}</span>
+                                                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' }}>Estilo Visual</span>
+                                                    <span style={{ color: 'var(--text-color)', fontSize: '13px', fontWeight: 600 }}>{biz.visualStyle}</span>
                                                 </div>
                                                 
                                                 <Link to={`/membros/negocio/${biz.id}`} style={{ textDecoration: 'none' }}>
                                                     <button style={{ 
-                                                        backgroundColor: '#fff', 
-                                                        color: '#000', 
+                                                        backgroundColor: 'var(--text-color)', 
+                                                        color: 'var(--bg-color)', 
                                                         border: 'none', 
                                                         width: '40px', 
                                                         height: '40px', 
@@ -395,7 +422,7 @@ const MembersDashboardPage: React.FC = () => {
                                                         <ChevronRight size={20} />
                                                     </button>
                                                 </Link>
-                                            </div>
+                                            </div>      </div>
                                         </motion.div>
                                     );
                                 })
