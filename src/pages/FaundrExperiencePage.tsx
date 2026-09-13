@@ -296,7 +296,7 @@ const FaundrExperiencePage: React.FC = () => {
                         display: 'inline-flex',
                         gap: '30px',
                         flexWrap: 'wrap',
-                        justify: 'center',
+                        justifyContent: 'center',
                         alignItems: 'center',
                         marginBottom: '50px',
                         padding: '16px 32px',
@@ -603,7 +603,7 @@ const FaundrExperiencePage: React.FC = () => {
                             border: '1px solid rgba(255,255,255,0.08)',
                             display: 'flex',
                             flexDirection: 'column',
-                            justify: 'space-between'
+                            justifyContent: 'space-between'
                         }}>
                             <div>
                                 <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', color: '#0011fd', marginBottom: '12px', display: 'block' }}>
@@ -658,7 +658,7 @@ const FaundrExperiencePage: React.FC = () => {
                             border: '2px solid #f83821',
                             display: 'flex',
                             flexDirection: 'column',
-                            justify: 'space-between',
+                            justifyContent: 'space-between',
                             position: 'relative',
                             boxShadow: '0 20px 50px rgba(248,56,33,0.15)'
                         }}>
@@ -833,7 +833,7 @@ const FaundrExperiencePage: React.FC = () => {
                         zIndex: 100,
                         display: 'flex',
                         alignItems: 'center',
-                        justify: 'center',
+                        justifyContent: 'center',
                         padding: '20px'
                     }}>
                         <motion.div

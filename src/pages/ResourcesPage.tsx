@@ -55,6 +55,7 @@ interface DownloadableResource {
     description: string;
     image: string;
     content: string;
+    fileUrl?: string;
 }
 
 const dictionaryTerms: Term[] = [
@@ -626,7 +627,7 @@ const ResourcesPage: React.FC = () => {
                                         boxShadow: '0 4px 14px rgba(0,0,0,0.04)',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        justify: 'space-between',
+                                        justifyContent: 'space-between',
                                         position: 'relative',
                                         transition: 'transform 0.3s, box-shadow 0.3s'
                                     }}
@@ -671,7 +672,7 @@ const ResourcesPage: React.FC = () => {
                                                 left: '12px',
                                                 right: '12px',
                                                 display: 'flex',
-                                                justify: 'space-between',
+                                                justifyContent: 'space-between',
                                                 alignItems: 'center',
                                                 pointerEvents: 'none'
                                             }}>
@@ -742,7 +743,7 @@ const ResourcesPage: React.FC = () => {
                                                 cursor: 'pointer',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justify: 'center',
+                                                justifyContent: 'center',
                                                 gap: '10px',
                                                 boxShadow: '0 4px 14px rgba(16, 23, 31, 0.25)',
                                                 transition: 'all 0.25s ease'
@@ -820,7 +821,7 @@ FOUNDR FORGE © 2026
                                             boxShadow: '0 4px 14px rgba(0,0,0,0.04)',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            justify: 'space-between',
+                                            justifyContent: 'space-between',
                                             transition: 'transform 0.3s, box-shadow 0.3s'
                                         }}
                                         onMouseEnter={(e) => {
@@ -864,7 +865,7 @@ FOUNDR FORGE © 2026
                                                     left: '12px',
                                                     right: '12px',
                                                     display: 'flex',
-                                                    justify: 'space-between',
+                                                    justifyContent: 'space-between',
                                                     alignItems: 'center',
                                                     pointerEvents: 'none'
                                                 }}>
@@ -978,7 +979,7 @@ FOUNDR FORGE © 2026
                                                     cursor: 'pointer',
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    justify: 'center',
+                                                    justifyContent: 'center',
                                                     gap: '10px',
                                                     boxShadow: '0 4px 14px rgba(16, 23, 31, 0.25)',
                                                     transition: 'all 0.25s ease'
@@ -1041,7 +1042,7 @@ FOUNDR FORGE © 2026
                                         boxShadow: '0 4px 14px rgba(0,0,0,0.04)',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        justify: 'space-between',
+                                        justifyContent: 'space-between',
                                         position: 'relative',
                                         transition: 'transform 0.3s, box-shadow 0.3s'
                                     }}
@@ -1086,7 +1087,7 @@ FOUNDR FORGE © 2026
                                                 left: '12px',
                                                 right: '12px',
                                                 display: 'flex',
-                                                justify: 'space-between',
+                                                justifyContent: 'space-between',
                                                 alignItems: 'center',
                                                 pointerEvents: 'none'
                                             }}>
@@ -1157,7 +1158,7 @@ FOUNDR FORGE © 2026
                                                 cursor: 'pointer',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justify: 'center',
+                                                justifyContent: 'center',
                                                 gap: '10px',
                                                 boxShadow: '0 4px 14px rgba(16, 23, 31, 0.25)',
                                                 transition: 'all 0.25s ease'
@@ -1216,7 +1217,7 @@ FOUNDR FORGE © 2026
                                         boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        justify: 'space-between'
+                                        justifyContent: 'space-between'
                                     }}
                                 >
                                     <div>
@@ -1256,7 +1257,7 @@ FOUNDR FORGE © 2026
                                             textDecoration: 'none',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            justify: 'center',
+                                            justifyContent: 'center',
                                             gap: '8px',
                                             transition: 'all 0.25s'
                                         }}
@@ -1284,7 +1285,7 @@ FOUNDR FORGE © 2026
                         zIndex: 100,
                         display: 'flex',
                         alignItems: 'center',
-                        justify: 'center',
+                        justifyContent: 'center',
                         padding: '20px'
                     }}>
                         <motion.div

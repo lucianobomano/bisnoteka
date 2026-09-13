@@ -508,7 +508,7 @@ const OpportunitiesPage: React.FC = () => {
                     <div
                         style={{
                             display: 'flex',
-                            justify: 'center',
+                            justifyContent: 'center',
                             alignItems: 'center',
                             gap: isMobile ? '20px' : '50px',
                             padding: '24px 0 10px',
@@ -635,7 +635,7 @@ const OpportunitiesPage: React.FC = () => {
 
                     <div style={{
                         display: 'flex',
-                        justify: 'center',
+                        justifyContent: 'center',
                         alignItems: 'center',
                         gap: isMobile ? '24px' : '50px',
                         flexWrap: 'wrap',
@@ -664,7 +664,7 @@ const OpportunitiesPage: React.FC = () => {
                 {/* Header with Title & Controls */}
                 <div style={{
                     display: 'flex',
-                    justify: 'space-between',
+                    justifyContent: 'space-between',
                     alignItems: 'flex-end',
                     marginBottom: '48px',
                     paddingRight: isMobile ? '20px' : '60px',
@@ -728,7 +728,7 @@ const OpportunitiesPage: React.FC = () => {
                                 color: '#ffffff',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justify: 'center',
+                                justifyContent: 'center',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease'
                             }}
@@ -748,7 +748,7 @@ const OpportunitiesPage: React.FC = () => {
                                 color: '#ffffff',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justify: 'center',
+                                justifyContent: 'center',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease'
                             }}
@@ -929,7 +929,7 @@ const OpportunitiesPage: React.FC = () => {
                     
                     <div style={{
                         display: 'flex',
-                        justify: 'space-between',
+                        justifyContent: 'space-between',
                         alignItems: 'flex-end',
                         marginBottom: '50px',
                         flexWrap: 'wrap',
@@ -1187,7 +1187,7 @@ const OpportunitiesPage: React.FC = () => {
                                     padding: isMobile ? '20px' : '28px',
                                     display: 'flex',
                                     flexDirection: isMobile ? 'column' : 'row',
-                                    justify: 'space-between',
+                                    justifyContent: 'space-between',
                                     alignItems: isMobile ? 'flex-start' : 'center',
                                     gap: '24px',
                                     transition: 'all 0.25s ease'
@@ -1261,7 +1261,7 @@ const OpportunitiesPage: React.FC = () => {
                                     padding: '28px',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justify: 'space-between'
+                                    justifyContent: 'space-between'
                                 }}
                             >
                                 <div>

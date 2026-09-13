@@ -614,7 +614,7 @@ const AdminDashboard: React.FC = () => {
                                             boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            justify: 'space-between'
+                                            justifyContent: 'space-between'
                                         }}
                                     >
                                         <div>
@@ -640,7 +640,7 @@ const AdminDashboard: React.FC = () => {
                                                     left: '12px',
                                                     right: '12px',
                                                     display: 'flex',
-                                                    justify: 'space-between',
+                                                    justifyContent: 'space-between',
                                                     alignItems: 'center'
                                                 }}>
                                                     <span style={{

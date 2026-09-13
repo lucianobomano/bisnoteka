@@ -564,7 +564,7 @@ const CommunityPage: React.FC = () => {
                                         <p style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', color: '#cbd5e1', marginBottom: '1.25rem' }}>{post.content}</p>
 
                                         {/* Actions */}
-                                        <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTops: '0.75rem', gap: '1.5rem' }}>
+                                        <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '0.75rem', gap: '1.5rem' }}>
                                             <button 
                                                 onClick={() => handleLike(post.id)}
                                                 style={{ background: 'transparent', border: 'none', color: post.likedByUser ? '#ef4444' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontWeight: 500 }}
